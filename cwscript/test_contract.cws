@@ -1,63 +1,105 @@
 // line-comments with double slash
 // contract definition block
-contract CWTemplate {
-
-	// define custom errors
-	errors {
-        NotEnabled(),
-        Unauthorized, // if no arguments then () can be omitted
-        InsufficientFunds(balance: Uint128, needed: Uint128), // add data
-        UserGreeting(user: Addr, greeting: String) { // errors can be formatted in a message optionally
-            "{user} {greeting}"
-        }
+contract CW20 {
+	// declare a single error
+	error ImproperFormat(user: Addr, input: String) {
+		if input != None {
+			"wrong format for user, got {input}"
+		} else {
+			"wrong format for user"
+		}
 	}
-	
-	// define events that will be outputted to log
+
+	// define multiple error definitions using an 'errors' block
+	errors {
+		// you can now omit the prefixing 'error' keyword
+		NotEnabled(req_level: enum Levels { Admin, Student }) {
+			if req_level == Levels::Admin {
+				"you must be an admin to access this portion"
+			} else {
+				"the required level is student, unfortunately"
+			}
+		},
+		Unauthorized, // both args () and body {} can be omitted if not needed
+			InsufficientFunds(balance: Uint128, needed: Uint128) {
+				// use string interpolation
+				"you only had {balance}, which is less than the {needed} required"
+			}
+		}
+
+	// declare a single event type
+	event Action(method: String, owner: String, count: String)
+
+	// like errors, you can define multiple event types in an 'events' block
 	events {
-		Instantiate(method: String, owner: String, count: String),
-		Increment(method: String),
+		// events don't have {} bodies like errors
+		// however I'm planning to support it in the future
+		Increment(),
 		Reset(method: String)
 	}
 
-	// declare state
+	// you can define state either as a series of state... statements
+	// or grouped into a 'state' block.
+	state curr_num: i32 // simple singleton (item mode)
+	state balances[Addr]: Uint128 // you can also define maps
+	
+	// you are most likely going to use the 'state' block
+	// as contracts usually need to declare a lot of state and it can get repetitive
 	state {
-		config: struct Config { // you can define structs inline
+		config: struct ConfigData { // another singleton, with in-place defn
+			owner: Addr,
 			count: i32,
-			owner: Addr<User>,
-            token_addr: Addr<Contract>
+			fee_percent: Decimal 
 		},
-        // you can make easily multi-layered maps
-        balances[token: Addr][user: Addr]: Uint128
+
+		// you can easily make storage with complex deep maps
+		// the labels for map keys are mainly for annotation purposes
+		// they are optional (see middle)
+		token_balances[user: Addr][Addr][bucket: u32]: Uint128	
 	}
 
-	// define the instantiate handler
-	instantiate(count: i32) {
-	}
-
-	// exec denotes implementation of ExecuteMsg
-	exec increment() {
-		$state.config.count += 1
-        $state.config.balances[$state.config.token_addr][$msg.sender] = 
-	}
-	
-	// the message spec is defined as the function's arguments
-	exec reset(count: i32)
-    {
-		if $msg.sender != $state.config.owner {
-            fail! Unauthorized
+	// the 'instantiate' logic is here
+	instantiate(count: i32, fee_percent: Dec) {
+		$state.config = ConfigData {
+			owner: $env.sender,
+			count: count,
+			fee_percent: fee_percent,
 		}
-        $state.config.count = count
+		emit! Action("instantiate", $env.sender, count)
 	}
 
-	// define readonly contract queries
-	// query count() -> struct CountResponse { count: i32 } {
-    //    CountResponse { count: $state.config.count }
-    // }
+	// you define the ExecuteMsg handlers as such:
+	exec msg_name_snake_case(arg1: u32, arg2: Option<String>) {
+		// you don't need to return anything or write anything here
+	}
 
-    // another way (shorthand)
-    // this generates both the response message struct
-    query count() responds {
-        count: i32 = $state.config.count
-    }
-	
+	exec { // you could also do it like this
+		increment() {
+			$state.config.count += 1
+		}
+
+		reset(count: i32) {
+			if $env.sender != $state.config.owner {
+				fail! Unauthorized
+			}
+			$state.config.count = count
+		}
+	}
+
+	// we can use inline type declarations to make it more convenient
+	query count() -> struct CountResponse { count: i32 } {
+		CountResponse { count: $state.config.count }
+	}
+
+	// however, we can use another pattern...
+	query user_balance_for_token(user: Addr, token: Addr) -> @{
+		balance: Uint128 = $state.token_balances[user][token][1]
+	}
+
+	// this is equivalent to:
+	query user_balance_for_token(user: Addr, token: Addr) -> struct UserBalanceForTokenResponse { balance: Uint128 } {
+		UserBalanceForTokenResponse { balance: $state.token_balances[user][token][1] }
+	}
+
+	// such is the power of the contextual type declaration and assignment
 }
