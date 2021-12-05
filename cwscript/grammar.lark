@@ -1,0 +1,125 @@
+?ident: /[a-zA-Z_$][a-zA-Z0-9_]*/ // identity, variable names
+?ident_pascal: /[A-Z][a-zA-Z0-9_]*/ // identity that starts with capital
+arg_def: ident ":" type_expr
+fn_args: "(" (arg_def ("," arg_def)*)? ")"
+fn_body: "{" stmt* expr? "}"
+
+?start: top_level_stmt*
+
+?top_level_stmt:
+    | contract_block
+
+contract_block: "contract" ident_pascal "{" contract_inner* "}"
+
+// inside a contract block
+?contract_inner:
+    | error_def
+    | event_def
+    | state_def
+    | instantiate_def
+    | exec_def
+    | query_def
+
+_error_int: ident_pascal fn_args? error_body?
+?error_def:
+    | "error" _error_int -> error_def_inline
+    | "errors" "{" (_error_int ("," _error_int)*)? "}" -> error_def_grouped
+
+error_body: "{" stmt* expr? "}"
+
+_event_int: ident_pascal fn_args
+?event_def:
+    | "event" _event_int -> event_def_inline
+    | "events" "{" (_event_int ("," _event_int)*)? "}" -> event_def_grouped
+
+// state
+_state_int:
+    | item_def
+    | map_def
+
+item_def: ident ":" type_expr
+map_key_def: (ident ":")? type_expr
+map_def: ident ("[" map_key_def "]")+ ":" type_expr
+
+state_def:
+    | "state" _state_int -> state_def_inline
+    | "state" "{" (_state_int ("," _state_int)*)? "}" -> state_def_grouped
+
+instantiate_def: "instantiate" fn_args fn_body
+
+_exec_int: ident fn_args fn_body
+exec_def:
+    | "exec" _exec_int
+    | "exec" "{" _exec_int* "}"
+
+query_int:
+    | ident fn_args ("->" type_expr)? fn_body -> query_fn
+    | ident fn_args "responds" query_responds_expr -> query_responds
+
+?query_item_def_assign: ident ":" type_expr "=" expr
+?query_responds_expr: "{" (query_item_def_assign ("," query_item_def_assign)*","?)?"}"
+
+query_def: 
+    | "query" query_int
+    | "query" "{" query_int* "}"
+
+// statements
+
+stmt:
+    | assign_stmt
+    | if_stmt
+    | for_stmt
+    | fail_stmt
+
+assign_stmt: expr assign_op expr
+!assign_op: "=" | "+=" | "-=" | "*=" | "/=" | "%="
+if_stmt: "if" expr "{" stmt* "}"
+for_stmt: "for" ident "in" expr "{" stmt* "}"
+fail_stmt: "fail!" expr
+
+// expressions
+
+expr:
+    | "(" expr ")"
+    | member_access_expr
+    | lookup_expr
+    | prefix_op_expr
+    | infix_op_expr
+    | ident
+    | value
+
+member_access_expr: expr "." ident
+lookup_expr: expr "[" expr "]"
+prefix_op_expr: prefix_op expr
+!prefix_op: "!" | "-"
+infix_op_expr: expr infix_op expr
+!infix_op: "*" | "+" | "/" | "%" | "<" | "<=" | ">" | ">=" | "==" | "!=" | "in" | "&&" | "||"
+
+// types
+
+typename: ident type_param?
+type_param: "<" typename ">"
+type_def:
+    | struct_def
+type_expr: typename | type_def
+struct_def: "struct" ident_pascal "{" item_def ("," item_def)* "}"
+
+value:
+    | struct_val
+    | vector
+    | string
+    | integer
+
+_struct_assign: ident ":" expr
+struct_val: ident_pascal "{" _struct_assign ("," _struct_assign)* "}"
+
+string : ESCAPED_STRING
+integer: /[+\-]/? /[1-9][0-9]*/
+vector : "[" expr ("," expr)* "]"
+
+COMMENT : /\/\/[^\n]*/
+%ignore COMMENT
+
+%import common.ESCAPED_STRING
+%import common.WS
+%ignore WS

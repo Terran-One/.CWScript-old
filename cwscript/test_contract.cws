@@ -1,0 +1,63 @@
+// line-comments with double slash
+// contract definition block
+contract CWTemplate {
+
+	// define custom errors
+	errors {
+        NotEnabled(),
+        Unauthorized, // if no arguments then () can be omitted
+        InsufficientFunds(balance: Uint128, needed: Uint128), // add data
+        UserGreeting(user: Addr, greeting: String) { // errors can be formatted in a message optionally
+            "{user} {greeting}"
+        }
+	}
+	
+	// define events that will be outputted to log
+	events {
+		Instantiate(method: String, owner: String, count: String),
+		Increment(method: String),
+		Reset(method: String)
+	}
+
+	// declare state
+	state {
+		config: struct Config { // you can define structs inline
+			count: i32,
+			owner: Addr<User>,
+            token_addr: Addr<Contract>
+		},
+        // you can make easily multi-layered maps
+        balances[token: Addr][user: Addr]: Uint128
+	}
+
+	// define the instantiate handler
+	instantiate(count: i32) {
+	}
+
+	// exec denotes implementation of ExecuteMsg
+	exec increment() {
+		$state.config.count += 1
+        $state.config.balances[$state.config.token_addr][$msg.sender] = 
+	}
+	
+	// the message spec is defined as the function's arguments
+	exec reset(count: i32)
+    {
+		if $msg.sender != $state.config.owner {
+            fail! Unauthorized
+		}
+        $state.config.count = count
+	}
+
+	// define readonly contract queries
+	// query count() -> struct CountResponse { count: i32 } {
+    //    CountResponse { count: $state.config.count }
+    // }
+
+    // another way (shorthand)
+    // this generates both the response message struct
+    query count() responds {
+        count: i32 = $state.config.count
+    }
+	
+}
