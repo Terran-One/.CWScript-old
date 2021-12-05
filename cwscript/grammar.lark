@@ -1,15 +1,19 @@
 // CWScript Grammar v0.0.2 - 12/5/21
 
-?start: toplevel_stmt*
+start: file_code
 
-toplevel_stmt:
-    | contract_block
+file_code: root_lvl_stmt*
+
+root_lvl_stmt:
+    | decl_contract
 
 // CONTRACT BLOCK
 
-contract_block: "contract" ident_pascal "{" contract_stmt* "}"
+decl_contract: "contract" contract_defn
+contract_defn: ident_pascal "{" contract_defn_code "}"
+contract_defn_code: contract_stmt*
 
-contract_stmt:
+?contract_stmt:
     | decl_stmt // declarations
 
 // Declarations
@@ -23,22 +27,23 @@ contract_stmt:
     | decl_query
     | decl_type
 
-decl_error:
+?decl_error:
     | "error" error_defn
     | "errors" "{" error_defn ("," error_defn)* "}"
-error_defn: ident_pascal [fn_args] [fn_body]
+error_defn: ident_pascal fn_args? fn_body?
 
-decl_event:
+?decl_event:
     | "event" event_defn
     | "events" "{" event_defn ("," event_defn)* "}"
-event_defn: ident_pascal fn_args? fn_body?
+event_defn: ident_pascal fn_args fn_body?
 
-decl_state:
+?decl_state:
     | "state" state_defn
     | "state" "{" state_defn ("," state_defn)* "}"
 state_defn:
     | ident ":" type_expr -> item_defn
-    | ident decl_map_key+ ":" type_expr -> map_defn
+    | ident decl_map_keys ":" type_expr -> map_defn
+decl_map_keys: decl_map_key+
 decl_map_key: "[" (ident ":")? type_expr "]"
 
 decl_instantiate: "instantiate" fn_args fn_body
@@ -112,7 +117,7 @@ control_flow_stmt:
 
 // TYPE SYSTEM
 
-type_expr:
+?type_expr:
     | ident type_param? -> typename
     | decl_type
 

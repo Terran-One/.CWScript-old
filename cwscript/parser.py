@@ -11,9 +11,6 @@ grammar_path = os.path.join(os.path.dirname(__file__), "grammar.lark")
 grammar_file = open(grammar_path)
 grammar = grammar_file.read()
 
-class CWScriptToAST(Transformer):
-    pass
-
 def parse(text: str):
     cws_parser = Lark(grammar, start="start")
     tree = cws_parser.parse(text)
