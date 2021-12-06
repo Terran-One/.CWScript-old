@@ -26,15 +26,34 @@ class _ContractStmt(_Ast):
     pass
 
 
+class DeclTypes:
+    CONTRACT = "contract"
+    ERROR = "error"
+    EVENT = "event"
+    STATE = "state"
+    INSTANTIATE = "instantiate"
+    EXEC = "exec"
+    QUERY = "query"
+    STRUCT = "struct"
+    ENUM = "enum"
+
+
 @dataclass
-class ContractDefnCode(_Ast, ast_utils.AsList):
-    children: List[_ContractStmt]
+class StructDefinition:
+    name: str
+    type: str
+    members: str
 
 
 @dataclass
 class ContractDefn(_Ast):
     name: str
-    body: ContractDefnCode
+    statements: List[_ContractStmt]
+
+
+@dataclass
+class DeclContract(_Ast):
+    defn: ContractDefn
 
 
 @dataclass
@@ -109,5 +128,5 @@ class ExecDefn(_Ast):
 ## Transformer
 class CWScriptToAST(Transformer):
     @v_args(inline=True)
-    def start(self, x):
-        return x
+    def contract_stmts(self, *stmts):
+        return stmts

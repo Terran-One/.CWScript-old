@@ -1,17 +1,15 @@
 // CWScript Grammar v0.0.2 - 12/5/21
-
-start: file_code
-
 file_code: root_lvl_stmt*
 
-root_lvl_stmt:
+// the file 
+?root_lvl_stmt:
     | decl_contract
 
 // CONTRACT BLOCK
 
-decl_contract: "contract" contract_defn
-contract_defn: ident_pascal "{" contract_defn_code "}"
-contract_defn_code: contract_stmt*
+?decl_contract: "contract" contract_defn
+contract_defn: ident_pascal "{" contract_stmts "}"
+contract_stmts: contract_stmt*
 
 ?contract_stmt:
     | decl_stmt // declarations
@@ -43,23 +41,24 @@ event_defn: ident_pascal fn_args fn_body?
 state_defn:
     | ident ":" type_expr -> item_defn
     | ident decl_map_keys ":" type_expr -> map_defn
-decl_map_keys: decl_map_key+
-decl_map_key: "[" (ident ":")? type_expr "]"
+?decl_map_keys: map_key_defn+
+map_key_defn: "[" (ident ":")? type_expr "]"
 
-decl_instantiate: "instantiate" fn_args fn_body
+?decl_instantiate: "instantiate" instantiate_defn
+instantiate_defn: fn_args fn_body
 
-decl_exec:
+?decl_exec:
     | "exec" exec_defn
     | "exec" "{" exec_defn+ "}"
 exec_defn: ident fn_args fn_body
 
-decl_query:
+?decl_query:
     | "query" query_defn
     | "query" "{" query_defn+ "}"
 query_defn:
     | ident fn_args "->" type_expr fn_body
-    | ident fn_args "->" decl_assign_struct
-decl_assign_struct: "@" ident_pascal? "{" (decl_assign_struct_member ("," decl_assign_struct_member)* ","?)? "}"
+    | ident fn_args "responds" decl_assign_struct
+decl_assign_struct:  @ "{" (decl_assign_struct_member ("," decl_assign_struct_member)* ","?)? "}"
 decl_assign_struct_member: ident ":" type_expr "=" expr
 
 decl_struct:
@@ -120,6 +119,7 @@ control_flow_stmt:
 ?type_expr:
     | ident type_param? -> typename
     | decl_type
+    | type_expr "?"
 
 decl_type: decl_struct | decl_enum
 
