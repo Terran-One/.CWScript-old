@@ -59,18 +59,18 @@ query_defn:
     | ident fn_args "->" type_expr [fn_body] -> query_defn_fn
     | ident fn_args "responds" response_defn -> query_defn_responds
 
-response_defn: "{" [decl_response_members ","?] "}"
+?response_defn: "{" [decl_response_members ","?] "}"
 ?decl_response_members: type_assign_and_set ("," type_assign_and_set)*
 
 ?decl_struct:
-    | "struct" ident_pascal "{" [decl_struct_members ","?] "}" -> decl_struct_dict
-    | "struct" ident_pascal "(" [decl_struct_members] ")" -> decl_struct_tuple
+    | "struct" ident_pascal "{" [type_assigns ","?] "}" -> decl_struct_dict
+    | "struct" ident_pascal "(" [type_assigns] ")" -> decl_struct_tuple
     | "struct" ident_pascal -> decl_struct_unit
 
-?decl_struct_members: type_assign ("," type_assign)*
 ?decl_and_set_struct_members: type_assign_and_set ("," type_assign_and_set)*
+?type_assigns: type_assign ("," type_assign)*
 type_assign: ident ":" type_expr
-type_assign_and_set: ident ":" type_expr "=" expr
+type_assign_and_set: type_assign "=" expr
 
 ?decl_enum:
     | "enum" ident_pascal "{" [decl_enum_variants] "}"
@@ -82,8 +82,8 @@ type_assign_and_set: ident ":" type_expr "=" expr
 
 // FUNCTION SYNTAX
 
-?fn_args: "(" (decl_fn_arg ("," decl_fn_arg)*)? ")"
-decl_fn_arg: ident ":" type_expr
+?fn_args: "(" [type_assigns] ")"
+?decl_fn_arg: ident ":" type_expr
 fn_body: "{" (stmt | expr)* "}"
 
 // STATEMENTS
@@ -125,7 +125,7 @@ fn_call_expr: ident "(" [fn_call_args] ")"
 
 // TYPE SYSTEM
 
-type_expr:
+?type_expr:
     | ident -> typename
     | decl_type
     | type_expr type_param -> paramzd_type_expr
@@ -138,17 +138,20 @@ typename: ident
 // VALS
 
 ?value:
-    | struct
+    | struct_val
     | vector
     | string
     | integer
     | "true" -> true
     | "false" -> false
 
-struct:
-    | ident_pascal "{" (struct_dict_assign ("," struct_dict_assign)* ","?)? "}" -> dict_struct
-    | ident_pascal "(" (struct_tuple_assign ",")* ")" -> tuple_struct
+?struct_val:
+    | ident_pascal "{" [struct_dict_assigns] "}" -> dict_struct_val
+    | ident_pascal "(" [struct_tuple_assigns] ")" -> tuple_struct_val
+
+?struct_dict_assigns: struct_dict_assign ("," struct_dict_assign)* ","?
 struct_dict_assign: ident ":" expr
+?struct_tuple_assigns: struct_tuple_assign ("," struct_tuple_assign)*
 struct_tuple_assign: [ident ":"] expr
 
 // TERMINALS

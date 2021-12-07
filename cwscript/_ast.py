@@ -75,6 +75,11 @@ class DeclEvent(_Ast, ast_utils.AsList):
 
 
 @dataclass
+class DeclExec(_Ast, ast_utils.AsList):
+    exec_defns: str
+
+
+@dataclass
 class EventDefn(_Ast):
     name: str
     args: str
@@ -156,12 +161,18 @@ class IfElseIfElseExpr(_Ast):
     else_clause: str
 
 
+# @dataclass
+# class Struct(_Ast):
+#     name: str
+#     member_vals: str
+
+
 class _QueryDefn(_Ast):
     pass
 
 
 @dataclass
-class QueryDefnFn(_Ast):
+class QueryDefnFn(_QueryDefn):
     name: str
     args: str
     response_type: str
@@ -169,13 +180,11 @@ class QueryDefnFn(_Ast):
 
 
 @dataclass
-class QueryDefnResponds(_Ast):
+class QueryDefnResponds(_QueryDefn):
     name: str
     args: str
     response_defn: str
 
-@dataclass
-class ResponseDefn(_Ast)
 
 class _TypeExpr(_Ast):
     pass
@@ -188,7 +197,7 @@ class TypeAssign(_Ast):
 
 
 @dataclass
-class Typename(_Ast):
+class Typename(_TypeExpr):
     name: str
 
 
@@ -198,22 +207,54 @@ class ParamzdTypeExpr(_TypeExpr):
     param: str
 
 
+@dataclass
+class StructDictAssign(_Ast):
+    name: str
+    value: str
+
+
+@dataclass
+class InstantiateDefn(_Ast):
+    args: str
+    body: str
+
+
+@dataclass
+class TypeAssignAndSet(_Ast):
+    type_assign: TypeAssign
+    value: str
+
+
+@dataclass
+class AssignStmt(_Stmt):
+    lhs: str
+    assign_op: str
+    rhs: str
+
+
+@dataclass
+class MapKeyDefn(_Ast):
+    key: str
+    type: str
+
+
+class _Value(_Expr):
+    pass
+
+
 ## Transformer
 class CWScriptToAST(Transformer):
     @v_args(inline=True)
     def contract_stmts(self, *stmts):
         return stmts
 
-    def decl_fn_arg(self, x):
-        return (x[0], x[1])
-
-    def map_key_defn(self, x):
-        return (x[0], x[1])
-
-    def fn_call_args(self, x):
+    def decl_map_keys(self, x):
         return x
 
-    def fn_args(self, x):
+    def type_assigns(self, x):
+        return x
+    
+    def fn_call_args(self, x):
         return x
 
     def fn_body(self, x):
