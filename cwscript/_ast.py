@@ -1,5 +1,6 @@
 from typing import List, Union
 from dataclasses import dataclass
+from collections import namedtuple
 
 from lark import ast_utils, Transformer, v_args
 from lark.tree import Meta
@@ -39,13 +40,6 @@ class DeclTypes:
 
 
 @dataclass
-class StructDefinition:
-    name: str
-    type: str
-    members: str
-
-
-@dataclass
 class ContractDefn(_Ast):
     name: str
     statements: List[_ContractStmt]
@@ -59,7 +53,7 @@ class DeclContract(_Ast):
 @dataclass
 class ErrorDefn(_Ast):
     name: str
-    args: str = None
+    args: list = None
     body: str = None
 
 
@@ -81,14 +75,10 @@ class DeclEvent(_Ast, ast_utils.AsList):
 
 
 @dataclass
-class FnArgs(_Ast, ast_utils.AsList):
-    children: list
-
-
-@dataclass
-class DeclFnArg(_Ast):
+class EventDefn(_Ast):
     name: str
-    type_expr: str
+    args: str
+    body: str = None
 
 
 class _StateDefn(_Ast):
@@ -102,27 +92,110 @@ class ItemDefn(_StateDefn):
 
 
 @dataclass
-class TypeExpr(_Ast):
-    body: str
-
-
-@dataclass
 class MapDefn(_StateDefn):
-    base_key: str
-    keys: list
-    value: TypeExpr
-
-
-@dataclass
-class FnBody(_Ast, ast_utils.AsList):
-    children: List[Union[_Stmt, _Expr]]
+    prefix: str
+    type_keys: list
+    type_value: str
 
 
 @dataclass
 class ExecDefn(_Ast):
     name: str
-    args: FnArgs
-    body: FnBody
+    args: list
+    body: str
+
+
+@dataclass
+class InfixOpExpr(_Ast):
+    lhs: str
+    op: str
+    rhs: str
+
+
+@dataclass
+class MemberAccessExpr(_Ast):
+    item: str
+    member: str
+
+
+@dataclass
+class TableLookupExpr(_Ast):
+    item: str
+    key: str
+
+
+@dataclass
+class FnCallExpr(_Ast):
+    fn_name: str
+    args: list
+
+
+@dataclass
+class IfExpr(_Ast):
+    if_clause: str
+    else_if_clause: str
+    else_body: str
+
+
+@dataclass
+class IfClause(_Ast):
+    predicate: str
+    body: str
+
+
+@dataclass
+class ElseIfClause(_Ast):
+    predicate: str
+    body: str
+
+
+@dataclass
+class IfElseIfElseExpr(_Ast):
+    if_clause: str
+    else_if_clauses: str
+    else_clause: str
+
+
+class _QueryDefn(_Ast):
+    pass
+
+
+@dataclass
+class QueryDefnFn(_Ast):
+    name: str
+    args: str
+    response_type: str
+    body: str
+
+
+@dataclass
+class QueryDefnResponds(_Ast):
+    name: str
+    args: str
+    response_defn: str
+
+@dataclass
+class ResponseDefn(_Ast)
+
+class _TypeExpr(_Ast):
+    pass
+
+
+@dataclass
+class TypeAssign(_Ast):
+    symbol: str
+    type: _TypeExpr
+
+
+@dataclass
+class Typename(_Ast):
+    name: str
+
+
+@dataclass
+class ParamzdTypeExpr(_TypeExpr):
+    base_type: str
+    param: str
 
 
 ## Transformer
@@ -130,3 +203,30 @@ class CWScriptToAST(Transformer):
     @v_args(inline=True)
     def contract_stmts(self, *stmts):
         return stmts
+
+    def decl_fn_arg(self, x):
+        return (x[0], x[1])
+
+    def map_key_defn(self, x):
+        return (x[0], x[1])
+
+    def fn_call_args(self, x):
+        return x
+
+    def fn_args(self, x):
+        return x
+
+    def fn_body(self, x):
+        return x
+
+    def integer(self, x):
+        return int(x[0])
+
+    def string(self, x):
+        return str(x[0])
+
+    def infix_op(self, x):
+        return x[0]
+
+    def assign_op(self, x):
+        return str(x[0])

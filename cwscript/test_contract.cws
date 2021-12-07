@@ -92,7 +92,7 @@ contract CW20 {
 	}
 
 	// however, we can use another pattern...
-	query user_balance_for_token(user: Addr, token: Addr) -> @{
+	query user_balance_for_token(user: Addr, token: Addr) responds {
 		balance: Uint128 = $state.token_balances[user][token][1]
 	}
 

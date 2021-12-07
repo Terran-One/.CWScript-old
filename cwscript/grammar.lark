@@ -28,12 +28,12 @@ contract_stmts: contract_stmt*
 ?decl_error:
     | "error" error_defn
     | "errors" "{" error_defn ("," error_defn)* "}"
-error_defn: ident_pascal fn_args? fn_body?
+error_defn: ident_pascal [fn_args] [fn_body]
 
 ?decl_event:
     | "event" event_defn
     | "events" "{" event_defn ("," event_defn)* "}"
-event_defn: ident_pascal fn_args fn_body?
+event_defn: ident_pascal [fn_args] [fn_body]
 
 ?decl_state:
     | "state" state_defn
@@ -42,62 +42,68 @@ state_defn:
     | ident ":" type_expr -> item_defn
     | ident decl_map_keys ":" type_expr -> map_defn
 ?decl_map_keys: map_key_defn+
-map_key_defn: "[" (ident ":")? type_expr "]"
+map_key_defn: "[" [ident ":"] type_expr "]"
 
 ?decl_instantiate: "instantiate" instantiate_defn
-instantiate_defn: fn_args fn_body
+instantiate_defn: fn_args [fn_body]
 
 ?decl_exec:
     | "exec" exec_defn
     | "exec" "{" exec_defn+ "}"
-exec_defn: ident fn_args fn_body
+exec_defn: ident fn_args [fn_body]
 
 ?decl_query:
     | "query" query_defn
     | "query" "{" query_defn+ "}"
 query_defn:
-    | ident fn_args "->" type_expr fn_body
-    | ident fn_args "responds" decl_assign_struct
-decl_assign_struct:  @ "{" (decl_assign_struct_member ("," decl_assign_struct_member)* ","?)? "}"
-decl_assign_struct_member: ident ":" type_expr "=" expr
+    | ident fn_args "->" type_expr [fn_body] -> query_defn_fn
+    | ident fn_args "responds" response_defn -> query_defn_responds
 
-decl_struct:
-    | "struct" ident_pascal "{" (decl_struct_member ("," decl_struct_member)* ","?)? "}" -> decl_dict_struct
-    | "struct" ident_pascal "(" (decl_struct_member ("," decl_struct_member)*)? ")" -> decl_tuple_struct
-    | "struct" ident_pascal -> decl_unit_struct
-decl_struct_member: ident ":" type_expr
+response_defn: "{" [decl_response_members ","?] "}"
+?decl_response_members: type_assign_and_set ("," type_assign_and_set)*
 
-decl_enum:
-    | "enum" ident_pascal "{" (decl_enum_variant ("," decl_enum_variant)* ","?)? "}"
-decl_enum_variant:
-    | ident_pascal "{" (decl_struct_member ("," decl_struct_member)* ","?)? "}" -> enum_variant_dict
-    | ident_pascal "(" (decl_struct_member ("," decl_struct_member)*)? ")" -> enum_variant_tuple
+?decl_struct:
+    | "struct" ident_pascal "{" [decl_struct_members ","?] "}" -> decl_struct_dict
+    | "struct" ident_pascal "(" [decl_struct_members] ")" -> decl_struct_tuple
+    | "struct" ident_pascal -> decl_struct_unit
+
+?decl_struct_members: type_assign ("," type_assign)*
+?decl_and_set_struct_members: type_assign_and_set ("," type_assign_and_set)*
+type_assign: ident ":" type_expr
+type_assign_and_set: ident ":" type_expr "=" expr
+
+?decl_enum:
+    | "enum" ident_pascal "{" [decl_enum_variants] "}"
+?decl_enum_variants: decl_enum_variant ("," decl_enum_variant)* ","?
+?decl_enum_variant:
+    | ident_pascal "{" (type_assign ("," type_assign)* ","?)? "}" -> enum_variant_dict
+    | ident_pascal "(" (type_assign ("," type_assign)*)? ")" -> enum_variant_tuple
     | ident_pascal -> enum_variant_unit
 
 // FUNCTION SYNTAX
 
-fn_args: "(" (decl_fn_arg ("," decl_fn_arg)*)? ")"
+?fn_args: "(" (decl_fn_arg ("," decl_fn_arg)*)? ")"
 decl_fn_arg: ident ":" type_expr
 fn_body: "{" (stmt | expr)* "}"
 
 // STATEMENTS
 
-stmt:
+?stmt:
     | expr assign_op expr -> assign_stmt
     | control_flow_stmt
     | "emit!" expr -> emit_stmt
-    | "fail!" expr? -> fail_stmt
-    | "return" expr? -> return_stmt
+    | "fail!" [expr] -> fail_stmt
+    | "return" [expr] -> return_stmt
 
 !assign_op: "=" | "+=" | "-=" | "*=" | "/=" | "%="
 
-if_expr: "if" expr "{" (stmt|expr)* "}"
-else_if_clause: "else" "if" expr "{" (stmt|expr)* "}"
-if_else_if_else_expr: if_expr else_if_clause* "else" "{" (stmt|expr)* "}"
+if_expr: if_clause [else_if_clauses] ["else" fn_body]
+if_clause: "if" expr fn_body
+else_if_clause: "else" if_expr
+?else_if_clauses: else_if_clauses+
 
-control_flow_stmt:
+?control_flow_stmt:
     | if_expr
-    | if_else_if_else_expr
 
 // EXPRESSIONS
 
@@ -107,23 +113,27 @@ control_flow_stmt:
     | expr "[" expr "]" -> table_lookup_expr
     | prefix_op expr -> prefix_op_expr
     | expr infix_op expr -> infix_op_expr
-    | ident "(" (expr ("," expr)*)? ")" -> fn_call_expr
+    | fn_call_expr
     | ident
     | value
 
 !prefix_op: "!" | "-"
 !infix_op: "*" | "+" | "/" | "%" | "<" | "<=" | ">" | ">=" | "==" | "!=" | "&&" | "||" | "::"
 
+fn_call_expr: ident "(" [fn_call_args] ")"
+?fn_call_args: expr ("," expr)*
+
 // TYPE SYSTEM
 
-?type_expr:
-    | ident type_param? -> typename
+type_expr:
+    | ident -> typename
     | decl_type
-    | type_expr "?"
+    | type_expr type_param -> paramzd_type_expr
+    | type_expr "?" -> inline_option
 
-decl_type: decl_struct | decl_enum
-
-type_param: "<" type_expr ">"
+typename: ident
+?decl_type: decl_struct | decl_enum
+?type_param: "<" type_expr ">"
 
 // VALS
 
@@ -136,9 +146,10 @@ type_param: "<" type_expr ">"
     | "false" -> false
 
 struct:
-    | ident_pascal "{" (struct_assign ("," struct_assign)* ","?)? "}" -> dict_struct
-    | ident_pascal "(" (struct_assign ",")* ")" -> tuple_struct
-struct_assign: ident ":" expr
+    | ident_pascal "{" (struct_dict_assign ("," struct_dict_assign)* ","?)? "}" -> dict_struct
+    | ident_pascal "(" (struct_tuple_assign ",")* ")" -> tuple_struct
+struct_dict_assign: ident ":" expr
+struct_tuple_assign: [ident ":"] expr
 
 // TERMINALS
 
@@ -150,7 +161,7 @@ struct_assign: ident ":" expr
 
 string : ESCAPED_STRING
 integer: /[+\-]/? /[1-9][0-9]*/
-vector : "[" expr ("," expr)* "]"
+vector : "[" (expr ("," expr)*)? "]"
 
 COMMENT : /\/\/[^\n]*/
 %ignore COMMENT
