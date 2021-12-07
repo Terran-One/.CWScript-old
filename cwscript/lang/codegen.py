@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 import os
 from typing import Any
 
@@ -9,6 +10,31 @@ class CGContext(Context):
 
 class CGEnv(Env):
     pass
+
+@dataclass
+class CGContractModel:
+    
+    # msg.rs
+    instantiate_msg = []
+    execute_msgs = []
+    query_msgs = []
+    query_responses = []
+   
+    # state.rs
+    items = []
+    maps = []
+    
+    # errors.rs
+    errors = []
+    
+    # events.rs
+    events = [] 
+    
+    # contract.rs
+    instantiate_fn = []
+    execute_fns = []
+    query_fns = []
+    
 
 
 class ICodegen:

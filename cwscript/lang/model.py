@@ -4,7 +4,11 @@ from cwscript.lang.ast_nodes import _DeclStmt, _StateDefn, _QueryDefn
 from cwscript.lang.ast_nodes import *
 from cwscript.util.strings import camel_to_snake
 from cwscript.template import contract_crate_templates as templates, render_to_file
+
 class ContractModel:
+
+    """Creates a logical representation of the contract which can be
+    converted into code."""
 
     name: str
     errors: list
@@ -13,7 +17,7 @@ class ContractModel:
     instantiate: list
     exec: list
     query: list
-
+    
     def __init__(self, name: str):
         self.name = name
         self.errors = []
@@ -22,6 +26,7 @@ class ContractModel:
         self.instantiate = []
         self.exec = []
         self.query = []
+        self.query_responses = []
 
     def add_defn(self, defn) -> "ContractModel":
         if isinstance(defn, ErrorDefn):
@@ -39,6 +44,9 @@ class ContractModel:
         else:
             raise TypeError(f"definition not supported: {defn}")
         return self
+    
+    def compute_cg_model(self):
+        """Create the codegen model."""
 
     def derive_inline_types(self):
         """Called after all definitions have been added. Types used inline
@@ -84,7 +92,6 @@ class ContractModel:
         # render_to_file(templates["src/lib.rs"], to / "src/lib.rs", model=self) 
         # # write source files
         # render_to_file(templates["src/contract.rs"], to / "Cargo.toml", model=self) 
-        
 
 
 def build_contract_model(contract_defn: ContractDefn) -> ContractModel:
