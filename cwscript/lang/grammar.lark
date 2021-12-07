@@ -11,13 +11,11 @@ file_code: root_lvl_stmt*
 contract_defn: ident_pascal "{" contract_stmts "}"
 contract_stmts: contract_stmt*
 
-?contract_stmt:
-    | decl_stmt // declarations
+?contract_stmt: decl_stmt // declarations
 
 // Declarations
 
-?decl_stmt:
-    | decl_error
+?decl_stmt: decl_error
     | decl_event
     | decl_state
     | decl_instantiate
@@ -25,59 +23,54 @@ contract_stmts: contract_stmt*
     | decl_query
     | decl_type
 
-?decl_error:
-    | "error" error_defn
+decl_error: "error" error_defn
     | "errors" "{" error_defn ("," error_defn)* "}"
 error_defn: ident_pascal [fn_args] [fn_body]
 
-?decl_event:
-    | "event" event_defn
+decl_event: "event" event_defn
     | "events" "{" event_defn ("," event_defn)* "}"
 event_defn: ident_pascal [fn_args] [fn_body]
 
-?decl_state:
-    | "state" state_defn
+decl_state: "state" state_defn
     | "state" "{" state_defn ("," state_defn)* "}"
-state_defn:
-    | ident ":" type_expr -> item_defn
+state_defn: ident ":" type_expr -> item_defn
     | ident decl_map_keys ":" type_expr -> map_defn
-?decl_map_keys: map_key_defn+
+decl_map_keys: map_key_defn+
 map_key_defn: "[" [ident ":"] type_expr "]"
 
-?decl_instantiate: "instantiate" instantiate_defn
+decl_instantiate: "instantiate" instantiate_defn
 instantiate_defn: fn_args [fn_body]
 
-?decl_exec:
-    | "exec" exec_defn
+decl_exec: "exec" exec_defn
     | "exec" "{" exec_defn+ "}"
 exec_defn: ident fn_args [fn_body]
 
-?decl_query:
+decl_query:
     | "query" query_defn
     | "query" "{" query_defn+ "}"
-query_defn:
-    | ident fn_args "->" type_expr [fn_body] -> query_defn_fn
+query_defn: ident fn_args "->" type_expr [fn_body] -> query_defn_fn
     | ident fn_args "responds" response_defn -> query_defn_responds
 
 ?response_defn: "{" [decl_response_members ","?] "}"
 ?decl_response_members: type_assign_and_set ("," type_assign_and_set)*
 
-?decl_struct:
-    | "struct" ident_pascal "{" [type_assigns ","?] "}" -> decl_struct_dict
-    | "struct" ident_pascal "(" [type_assigns] ")" -> decl_struct_tuple
-    | "struct" ident_pascal -> decl_struct_unit
+?decl_struct: "struct" struct_dict_defn
+    | "struct" struct_tuple_defn
+    | "struct" struct_unit_defn
+
+struct_dict_defn: ident_pascal "{" [type_assigns ","?] "}"
+struct_tuple_defn: ident_pascal "(" [type_assigns] ")"
+struct_unit_defn: ident_pascal
 
 ?decl_and_set_struct_members: type_assign_and_set ("," type_assign_and_set)*
-?type_assigns: type_assign ("," type_assign)*
+type_assigns: type_assign ("," type_assign)*
 type_assign: ident ":" type_expr
 type_assign_and_set: type_assign "=" expr
 
-?decl_enum:
-    | "enum" ident_pascal "{" [decl_enum_variants] "}"
+?decl_enum: "enum" ident_pascal "{" [decl_enum_variants] "}"
 ?decl_enum_variants: decl_enum_variant ("," decl_enum_variant)* ","?
-?decl_enum_variant:
-    | ident_pascal "{" (type_assign ("," type_assign)* ","?)? "}" -> enum_variant_dict
-    | ident_pascal "(" (type_assign ("," type_assign)*)? ")" -> enum_variant_tuple
+?decl_enum_variant: ident_pascal "{" [type_assigns ","] "}" -> enum_variant_dict
+    | ident_pascal "(" [type_assigns] ")" -> enum_variant_tuple
     | ident_pascal -> enum_variant_unit
 
 // FUNCTION SYNTAX
@@ -88,12 +81,13 @@ fn_body: "{" (stmt | expr)* "}"
 
 // STATEMENTS
 
-?stmt:
-    | expr assign_op expr -> assign_stmt
+?stmt: (ident_path | table_lookup_expr) assign_op expr -> assign_stmt
     | control_flow_stmt
     | "emit!" expr -> emit_stmt
     | "fail!" [expr] -> fail_stmt
     | "return" [expr] -> return_stmt
+
+ident_path: ident ("." ident)*
 
 !assign_op: "=" | "+=" | "-=" | "*=" | "/=" | "%="
 
@@ -102,15 +96,13 @@ if_clause: "if" expr fn_body
 else_if_clause: "else" if_expr
 ?else_if_clauses: else_if_clauses+
 
-?control_flow_stmt:
-    | if_expr
+?control_flow_stmt: if_expr
 
 // EXPRESSIONS
 
-?expr:
-    | "(" expr ")"
+?expr: "(" expr ")"
     | expr "." ident -> member_access_expr 
-    | expr "[" expr "]" -> table_lookup_expr
+    | table_lookup_expr
     | prefix_op expr -> prefix_op_expr
     | expr infix_op expr -> infix_op_expr
     | fn_call_expr
@@ -120,13 +112,13 @@ else_if_clause: "else" if_expr
 !prefix_op: "!" | "-"
 !infix_op: "*" | "+" | "/" | "%" | "<" | "<=" | ">" | ">=" | "==" | "!=" | "&&" | "||" | "::"
 
+table_lookup_expr: expr "[" expr "]"
 fn_call_expr: ident "(" [fn_call_args] ")"
 ?fn_call_args: expr ("," expr)*
 
 // TYPE SYSTEM
 
-?type_expr:
-    | ident -> typename
+?type_expr: ident -> typename
     | decl_type
     | type_expr type_param -> paramzd_type_expr
     | type_expr "?" -> inline_option
@@ -137,17 +129,15 @@ typename: ident
 
 // VALS
 
-?value:
-    | struct_val
+?value: struct_val
     | vector
     | string
     | integer
     | "true" -> true
     | "false" -> false
 
-?struct_val:
-    | ident_pascal "{" [struct_dict_assigns] "}" -> dict_struct_val
-    | ident_pascal "(" [struct_tuple_assigns] ")" -> tuple_struct_val
+?struct_val: ident_pascal "{" [struct_dict_assigns] "}" -> struct_dict_val
+    | ident_pascal "(" [struct_tuple_assigns] ")" -> struct_tuple_val
 
 ?struct_dict_assigns: struct_dict_assign ("," struct_dict_assign)* ","?
 struct_dict_assign: ident ":" expr

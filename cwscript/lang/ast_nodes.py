@@ -1,9 +1,9 @@
-from typing import List, Union
+from typing import List, Optional, Union
 from dataclasses import dataclass
-from collections import namedtuple
 
-from lark import ast_utils, Transformer, v_args
-from lark.tree import Meta
+from lark import ast_utils, Transformer
+from cwscript.lang.codegen import *
+
 
 ## AST Nodes
 class _Ast(ast_utils.Ast):
@@ -27,7 +27,7 @@ class _ContractStmt(_Ast):
     pass
 
 
-class DeclTypes:
+class _DeclStmt(_Ast):
     CONTRACT = "contract"
     ERROR = "error"
     EVENT = "event"
@@ -42,48 +42,41 @@ class DeclTypes:
 @dataclass
 class ContractDefn(_Ast):
     name: str
-    statements: List[_ContractStmt]
+    body: List[_ContractStmt]
 
 
 @dataclass
-class DeclContract(_Ast):
+class DeclContract(_DeclStmt):
     defn: ContractDefn
 
 
 @dataclass
 class ErrorDefn(_Ast):
     name: str
-    args: list = None
-    body: str = None
+    members: Optional[List["TypeAssign"]]
+    body: Optional[List[Union["_Stmt", "_Expr"]]]
 
 
 @dataclass
-class DeclError(_Ast, ast_utils.AsList):
-    children: list
-
-
-@dataclass
-class EventDefn(_Ast):
-    name: str
-    args: str = None
-    body: str = None
-
-
-@dataclass
-class DeclEvent(_Ast, ast_utils.AsList):
-    children: list
-
-
-@dataclass
-class DeclExec(_Ast, ast_utils.AsList):
-    exec_defns: str
+class DeclError(_DeclStmt, ast_utils.AsList):
+    defns: list
 
 
 @dataclass
 class EventDefn(_Ast):
     name: str
-    args: str
-    body: str = None
+    members: Optional[List["TypeAssign"]]
+    body: Optional[List[Union["_Stmt", "_Expr"]]]
+
+
+@dataclass
+class DeclEvent(_DeclStmt, ast_utils.AsList):
+    defns: list
+
+
+@dataclass
+class DeclExec(_DeclStmt, ast_utils.AsList):
+    defns: list
 
 
 class _StateDefn(_Ast):
@@ -138,7 +131,7 @@ class FnCallExpr(_Ast):
 @dataclass
 class IfExpr(_Ast):
     if_clause: str
-    else_if_clause: str
+    else_if_clauses: str
     else_body: str
 
 
@@ -172,6 +165,11 @@ class _QueryDefn(_Ast):
 
 
 @dataclass
+class DeclQuery(_DeclStmt, ast_utils.AsList):
+    defns: List[_QueryDefn]
+
+
+@dataclass
 class QueryDefnFn(_QueryDefn):
     name: str
     args: str
@@ -192,13 +190,20 @@ class _TypeExpr(_Ast):
 
 @dataclass
 class TypeAssign(_Ast):
-    symbol: str
+    name: str
     type: _TypeExpr
+
+    def _gen_code(self, env) -> str:
+        type_str = self.type.generate_code(env)
+        return f"{self.name:s}: {type_str}"
 
 
 @dataclass
 class Typename(_TypeExpr):
     name: str
+
+    def _gen_code(self, env) -> str:
+        return self.name
 
 
 @dataclass
@@ -220,6 +225,11 @@ class InstantiateDefn(_Ast):
 
 
 @dataclass
+class DeclInstantiate(_DeclStmt):
+    defn: InstantiateDefn
+
+
+@dataclass
 class TypeAssignAndSet(_Ast):
     type_assign: TypeAssign
     value: str
@@ -238,22 +248,99 @@ class MapKeyDefn(_Ast):
     type: str
 
 
+class EnumVariant(_Ast):
+    pass
+
+
+@dataclass
+class EnumVariantUnit(_Ast):
+    name: str
+
+
+@dataclass
+class EnumVariantTuple(_Ast):
+    name: str
+    members: list
+
+
+@dataclass
+class DeclEnum(_DeclStmt):
+    name: str
+    variants: List[EnumVariant]
+
+
+@dataclass
+class EnumVariantDict(_Ast):
+    name: str
+    members: list
+
+
+@dataclass
+class DeclState(_DeclStmt, ast_utils.AsList):
+    defns: list
+
+
+@dataclass
+class StructDictDefn(_DeclStmt):
+    name: str
+    members: List[TypeAssign]
+
+
+@dataclass
+class StructDictVal(_Ast):
+    name: str
+    members_vals: List[StructDictAssign]
+
+
+@dataclass
+class IdentPath(_Ast, ast_utils.AsList):
+    parts: List[str]
+
+
+@dataclass
+class EmitStmt(_Stmt):
+    expr: _Expr
+
+
+@dataclass
+class FailStmt(_Stmt):
+    expr: _Expr
+
+
 class _Value(_Expr):
     pass
 
 
+@dataclass
+class String(_Value):
+    value: str
+
+
+@dataclass
+class Integer(_Value):
+    value: int
+
+
 ## Transformer
 class CWScriptToAST(Transformer):
-    @v_args(inline=True)
-    def contract_stmts(self, *stmts):
+    def contract_stmts(self, stmts):
         return stmts
+
+    def struct_dict_assigns(self, x):
+        return x
+
+    def struct_tuple_assigns(self, x):
+        return x
+
+    def decl_enum_variants(self, x):
+        return x
 
     def decl_map_keys(self, x):
         return x
 
     def type_assigns(self, x):
         return x
-    
+
     def fn_call_args(self, x):
         return x
 
@@ -261,10 +348,10 @@ class CWScriptToAST(Transformer):
         return x
 
     def integer(self, x):
-        return int(x[0])
+        return Integer(x[0])
 
     def string(self, x):
-        return str(x[0])
+        return String(x[0])
 
     def infix_op(self, x):
         return x[0]

@@ -1,7 +1,5 @@
-import os
-from parser import parse
+from cwscript import CWScriptCompiler
 
-test_file_path = os.path.join(os.path.dirname(__file__), "test_contract.cws")
-text = open(test_file_path).read()
-tree = parse(text)
-print(tree)
+compiler = CWScriptCompiler()
+compiler.add_src_file("test_contract.cws")
+compiler.compile("output_dir")
