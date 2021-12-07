@@ -7,7 +7,7 @@ file_code: root_lvl_stmt*
 
 // CONTRACT BLOCK
 
-?decl_contract: "contract" contract_defn
+decl_contract: "contract" contract_defn
 contract_defn: ident_pascal "{" contract_stmts "}"
 contract_stmts: contract_stmt*
 

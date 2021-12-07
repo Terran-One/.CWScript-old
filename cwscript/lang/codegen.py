@@ -1,20 +1,8 @@
 import os
 from typing import Any
 
-from jinja2 import Environment
-from jinja2.loaders import FileSystemLoader
-
 from cwscript.util.context_env import Context, Env
-
-parent_dir = os.path.dirname(__file__)
-templates_dir = os.path.join(parent_dir, "templates")
-j_env = Environment(loader=FileSystemLoader(templates_dir))
-templates = {}
-for t in j_env.list_templates():
-    name = t[: t.find(".")]
-    templates[name] = j_env.get_template(t)
-
-
+from cwscript.template import codegen_templates as templates
 class CGContext(Context):
     pass
 
@@ -58,10 +46,9 @@ class ICodegen:
         return code
 
 
-def render_template(template_name: str, **kwargs):
+def render(template_name: str, **kwargs):
     template = templates[template_name]
     return template.render(**kwargs)
-
 
 class CGStructDefn(ICodegen):
     """Subclass inside a StructDefn-like `_Ast` node to add codegen."""
@@ -73,7 +60,7 @@ class CGStructDefn(ICodegen):
             self.body = []
 
     def _gen_code(self, env: CGEnv) -> str:
-        return render_template("struct_defn.rs.jinja", ref=self, env=env)
+        return render("struct_defn", struct=self, env=env)
 
 
 def iis(test, *types) -> bool:

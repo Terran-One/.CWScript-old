@@ -1,6 +1,9 @@
+from pathlib import Path
+
+from cwscript.lang.ast_nodes import _DeclStmt, _StateDefn, _QueryDefn
 from cwscript.lang.ast_nodes import *
-
-
+from cwscript.util.strings import camel_to_snake
+from cwscript.template import contract_crate_templates as templates, render_to_file
 class ContractModel:
 
     name: str
@@ -20,19 +23,6 @@ class ContractModel:
         self.exec = []
         self.query = []
 
-    @classmethod
-    def parse(cls, contract_defn: "ContractDefn") -> "ContractModel":
-        contract = cls()
-        contract.name = contract_defn.name
-        for stmt in contract_defn.body:
-            if isinstance(stmt, _DeclStmt):
-                if isinstance(stmt, DeclInstantiate):
-                    contract.add_defn(stmt.defn)
-                else:
-                    for defn in stmt.defns:
-                        contract.add_defn(defn)
-        return contract
-
     def add_defn(self, defn) -> "ContractModel":
         if isinstance(defn, ErrorDefn):
             self.errors.append(defn)
@@ -50,6 +40,10 @@ class ContractModel:
             raise TypeError(f"definition not supported: {defn}")
         return self
 
+    def derive_inline_types(self):
+        """Called after all definitions have been added. Types used inline
+        should be added where appropriate."""
+
     def __repr__(self) -> str:
         res = f"""Contract ({self.name})
         errors: {len(self.errors)} 
@@ -59,6 +53,38 @@ class ContractModel:
         query fns: {len(self.query)}
         """
         return res
+
+    def write_as_crate(self, to: Path, crate_name: str = None):
+        if crate_name is None:
+            crate_name = camel_to_snake(self.name)
+        
+        # create output dir
+        os.makedirs(to, exist_ok=True)
+        os.makedirs(to / "src", exist_ok=True)
+        os.makedirs(to / ".cargo", exist_ok=True)
+        
+        env = {
+            "crate_name": crate_name,
+            "model": self
+        }
+        
+        for (name, templ) in templates.items():
+            render_to_file(templ, to / name, **env)
+        
+        # # create Cargo.toml
+        # render_to_file(templates["Cargo.toml"], to / "Cargo.toml", crate_name=crate_name)
+        # # .gitignore
+        # render_to_file(templates[".gitignore"], to / ".gitignore")
+        # # rustfmt.toml
+        # render_to_file(templates["rustfmt.toml"], to / "rustfmt.toml")
+        # # .cargo/config
+        # render_to_file(templates[".cargo/config"], to / ".cargo/config")
+        
+        # # write source files
+        # render_to_file(templates["src/lib.rs"], to / "src/lib.rs", model=self) 
+        # # write source files
+        # render_to_file(templates["src/contract.rs"], to / "Cargo.toml", model=self) 
+        
 
 
 def build_contract_model(contract_defn: ContractDefn) -> ContractModel:
@@ -70,4 +96,5 @@ def build_contract_model(contract_defn: ContractDefn) -> ContractModel:
             else:
                 for defn in stmt.defns:
                     model.add_defn(defn)
+    model.derive_inline_types()
     return model

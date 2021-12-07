@@ -20,7 +20,7 @@ class _Expr(_Ast):
 
 @dataclass
 class FileCode(_Ast, ast_utils.AsList):
-    statements: list
+    body: list
 
 
 class _ContractStmt(_Ast):
@@ -63,11 +63,10 @@ class DeclError(_DeclStmt, ast_utils.AsList):
 
 
 @dataclass
-class EventDefn(_Ast):
+class EventDefn(_Ast, CGStructDefn):
     name: str
     members: Optional[List["TypeAssign"]]
     body: Optional[List[Union["_Stmt", "_Expr"]]]
-
 
 @dataclass
 class DeclEvent(_DeclStmt, ast_utils.AsList):

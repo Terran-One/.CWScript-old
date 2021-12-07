@@ -1,16 +1,19 @@
 import os
 from os import PathLike, mkdir
 from typing import List
+from pathlib import Path
 
 from cwscript.lang.parser import parse_cwscript_src
 from cwscript.lang.model import build_contract_model, ContractModel
 from cwscript.lang.ast_nodes import FileCode, DeclContract, ContractDefn
+from cwscript.util.strings import camel_to_snake
+from cwscript.template import contract_crate_templates as templates, render_to_file
 
 
 class CWScriptCompiler:
 
-    base_dir: PathLike
-    src_files: List[PathLike]
+    base_dir: Path
+    src_files: List[Path]
 
     def __init__(self, project_name="untitled", base_dir=None, src_files=[]):
         self.project_name = project_name
@@ -19,15 +22,15 @@ class CWScriptCompiler:
 
     def _getpath(self, path):
         if self.base_dir is None:
-            parent_dir = os.path.dirname(__name__)
-            return os.path.join(parent_dir, path)
-        return os.path.join(self.base_dir, path)
+            this_dir = Path(os.path.dirname(__name__))
+            return this_dir / path
+        return self.base_dir / path
 
     def add_src_file(self, src_file_path: PathLike):
         with open(self._getpath(src_file_path), "r"):
             self.src_files.append(src_file_path)
 
-    def compile(self, target_dir: PathLike):
+    def compile(self, target_dir: PathLike, name: str = None):
         file_codes = []
         for s in self.src_files:
             with open(s, "r") as src_file:
@@ -37,14 +40,31 @@ class CWScriptCompiler:
         contract_models = []
         for fc in file_codes:
             for stmt in fc.body:
+                print(stmt)
                 if isinstance(stmt, DeclContract):
                     contract_models.append(build_contract_model(stmt.defn))
         
         if len(contract_models) > 1:
-            self.write_project(contract_models, target_dir)
+            pass
         else:
-            self.write_contract(contract_models[0], target_dir)
+            contract_models[0].write_as_crate(self._getpath(target_dir), crate_name=name)
 
-    def write_contract(self, contract_model: ContractModel, target_dir: PathLike):
-        output_dir = self._getpath(target_dir)
-        Generate
+    def generate_crate(self, contract_model: ContractModel, target_dir: PathLike, crate_name: str = None):
+        if crate_name is None:
+            crate_name = camel_to_snake(contract_model.name)
+        out_dir = self._getpath(target_dir)
+        
+        # create output dir
+        os.makedirs(out_dir, exist_ok=True)
+        os.makedirs(out_dir / "src", exist_ok=True)
+        os.makedirs(out_dir / ".cargo", exist_ok=True)
+        
+        # create Cargo.toml
+        render_to_file(templates["Cargo.toml"], out_dir / "Cargo.toml", crate_name=crate_name)
+        # .gitignore
+        render_to_file(templates[".gitignore"], out_dir / ".gitignore")
+        # rustfmt.toml
+        render_to_file(templates["rustfmt.toml"], out_dir / "rustfmt.toml")
+        # .cargo/config
+        render_to_file(templates[".cargo/config"], out_dir / ".cargo/config")
+        
