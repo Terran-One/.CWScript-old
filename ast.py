@@ -615,6 +615,37 @@ FileCode(
                                                 )
                                             )
                                         ),
+                                        StructUnitDefn(
+                                            annotations=None,
+                                            name=Ident(
+                                                symbol=Token("__ANON_17", "Unit")
+                                            ),
+                                        ),
+                                        StructCDefn(
+                                            annotations=None,
+                                            name=Ident(
+                                                symbol=Token("__ANON_17", "Tiger")
+                                            ),
+                                            members=[
+                                                TypeAssign(
+                                                    annotations=None,
+                                                    name=Ident(
+                                                        symbol=Token(
+                                                            "__ANON_16", "item"
+                                                        )
+                                                    ),
+                                                    type=Option(
+                                                        wrapped=Typename(
+                                                            name=Ident(
+                                                                symbol=Token(
+                                                                    "__ANON_16", "u32"
+                                                                )
+                                                            )
+                                                        )
+                                                    ),
+                                                )
+                                            ],
+                                        ),
                                     ]
                                 ),
                             )

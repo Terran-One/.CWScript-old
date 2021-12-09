@@ -119,14 +119,20 @@ class _StateDefn(_Defn):
 
 
 @dataclass
+class MapKey(_Ast):
+    key: Ident
+    type: "_TypeExpr"
+
+
+@dataclass
 class ItemDefn(_StateDefn):
     key: Ident
     type: "_TypeExpr"
 
 @dataclass
 class MapDefn(_StateDefn):
-    prefix: str
-    keys: str
+    prefix: Ident
+    keys: MapKey
     value: str
     
 FnArgs = List["TypeAssign"]
@@ -228,13 +234,14 @@ class _TypeExpr(_Ast):
     @property
     def typestr(self) -> str:
         raise NotImplementedError(f"property {self.__class__}.typestr not implemented")
+    
 @dataclass
 class TupleType(_TypeExpr, ast_utils.AsList):
     members: List[_TypeExpr]
-    
+
     @property
     def typestr(self) -> str:
-        return f"(" + ",".join(m.typestr for m in self.members) + ")"
+        return f"({', '.join(m.typestr for m in self.members)})"
 
 @dataclass
 class VectorType(_TypeExpr):
@@ -258,36 +265,36 @@ class Option(_TypeExpr):
    
     @property 
     def typestr(self) -> str:
-        return "Option<{self.wrapped.typestr}>"
+        return f"Option<{self.wrapped.typestr}>"
 
 @dataclass
 class TypePath(_TypeExpr, ast_utils.AsList):
-    parts: List[Ident]
+    parts: List[_TypeExpr]
    
     @property 
     def typestr(self) -> str:
-        return "::".join(self.parts.join())
+        return "::".join(x.typestr for x in self.parts)
 
 @dataclass
 class SimplePath(_Ast, ast_utils.AsList):
     parts: List[Ident]
     
     def __str__(self) -> str:
-        return "::".join(self.parts)
+        return "::".join(str(x) for x in self.parts)
    
 @dataclass
 class TypeAssign(_Defn):
-    name: str
+    name: Ident 
     type: _TypeExpr
 
 
 @dataclass
 class Typename(_TypeExpr):
-    name: str
+    name: Ident 
 
     @property
     def typestr(self) -> str:
-        return self.name
+        return str(self.name)
 
 
 @dataclass
@@ -324,45 +331,35 @@ class AssignStmt(_Stmt):
     rhs: str
 
 
-@dataclass
-class MapKeyDefn(_Ast):
-    key: str
-    type: str
-
 
 @dataclass
 class EnumDefn(_Defn, _TypeExpr):
-    name: str
+    name: Ident
     variants: List[_EnumVariant]
 
     @property
     def typestr(self) -> str:
-        return self.name
+        return str(self.name)
 
 
 @dataclass
 class StructDefn(_Defn, _TypeExpr):
+    name: Ident
     
     @property
     def typestr(self) -> str:
-        return self.name
+        return str(self.name)
 @dataclass
 class StructCDefn(StructDefn):
-    name: Ident
     members: List[TypeAssign]
 
 @dataclass
 class StructTupleDefn(StructDefn):
-    name: Ident
     members: List[_TypeExpr]
 
 @dataclass
 class StructUnitDefn(StructDefn):
-    name: Ident
-@dataclass
-class MapKey(_Ast):
-    key: Ident
-    type: _TypeExpr
+    pass
 @dataclass
 class EmitStmt(_Stmt):
     expr: _Expr
@@ -403,7 +400,6 @@ alias_to = lambda t: lambda _, x: t(*x)
 ## Transformer
 class CWScriptToAST(Transformer):
 
-
     error_defn2 = alias_to(ErrorDefn)
     event_defn2 = alias_to(EventDefn)
     
@@ -443,7 +439,7 @@ class CWScriptToAST(Transformer):
     ## usually if the first elem is:
     ## RULE: "(" [plural] ")"
     fn_args = as_list
-    tuple = as_list
+    tuple_members = as_list
     struct_members = as_list
     struct_members_with_assign = as_list
     

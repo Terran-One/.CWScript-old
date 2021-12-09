@@ -6,20 +6,20 @@ use thiserror::Error;
 pub enum ContractError {
 #[error("{0}")]
 Std(#[from] StdError),
-{%- for err in errors -%}
+{% for err in errors %}
 {{ err.defn.name }} {
-{%- for member in err.defn.members -%}
+{% for member in err.defn.members %}
 {{ member.name }}: {{ member.type.typestr }},
-{%- endfor -%}
+{% endfor %}
 },
-{%- endfor -%}
+{% endfor %}
 }
 {% endmacro %}
 
 {% macro render_events(events) %}
 pub enum ContractEvent {
-{% for event in contract.events %}
-{{ event.name }} {
+{% for event in events %}
+{{ event.defn.name }} {
 {%- for member in event.members -%}
 {{ member.name }}: {{ member.type.typestr }},
 {%- endfor -%}
@@ -31,7 +31,7 @@ pub enum ContractEvent {
 {% macro render_instantiate_msg(inst) %}
 pub struct InstantiateMsg {
 {% for arg in inst.args %}
-{{ arg.name }}: {{arg.type.typestr}},
+{{ arg.name.to_pascal() }}: {{arg.type.typestr}},
 {% endfor %}
 }
 {% endmacro %}
@@ -39,7 +39,7 @@ pub struct InstantiateMsg {
 {% macro render_execute_msg(execs) %}
 pub enum ExecuteMsg {
 {% for exec in execs %}
-{{ exec.name }} {
+{{ exec.name.to_pascal() }} {
 {%- for arg in execs.args -%}
 {{ arg.name }}: {{ arg.type.typestr }},
 {%- endfor -%}

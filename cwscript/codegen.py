@@ -17,7 +17,6 @@ class ContractCodegen:
     def __init__(self, contract_defn: ContractDefn):
         self.defn = contract_defn
         self.errors = self.defn.collect_type(ErrorDefn)
-        print(self.errors)
         self.events = self.defn.collect_type(EventDefn)
         self.instantiate = self.defn.collect_type(InstantiateDefn)
         self.exec = self.defn.collect_type(ExecDefn)
