@@ -13,13 +13,14 @@ templates = defaultdict(dict)
 
 ## load templates
 for path in j_env.list_templates():
-    slash_idx = path.find('/') 
+    slash_idx = path.find("/")
     domain = path[:slash_idx]
-    name = path[slash_idx+1:]
+    name = path[slash_idx + 1 :]
     templates[domain][name] = j_env.get_template(path)
-    
-codegen_templates = templates['codegen']
-contract_crate_templates = templates['contract_crate']
+
+codegen_templates = templates["codegen"]
+contract_crate_templates = templates["contract_crate"]
+
 
 def render_to_file(template, path, **args):
     with open(path, "w") as file:

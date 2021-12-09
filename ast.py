@@ -2,409 +2,420 @@ FileCode(
     body=[
         DeclContract(
             defn=ContractDefn(
-                name=Ident(symbol=Token("__ANON_16", "CW20")),
+                annotations=None,
+                name=Ident(symbol=Token("__ANON_17", "CW20")),
                 body=[
                     DeclError(
                         defns=[
                             ErrorDefn(
-                                name=Ident(symbol=Token("__ANON_16", "ImproperFormat")),
-                                members=[
-                                    TypeAssign(
-                                        name=Ident(symbol=Token("__ANON_15", "user")),
-                                        type=Typename(
-                                            name=Ident(
-                                                symbol=Token("__ANON_15", "Addr")
-                                            )
-                                        ),
+                                annotations=None,
+                                defn=EnumVariantStruct(
+                                    name=Ident(
+                                        symbol=Token("__ANON_17", "ImproperFormat")
                                     ),
-                                    TypeAssign(
-                                        name=Ident(symbol=Token("__ANON_15", "input")),
-                                        type=Typename(
-                                            name=Ident(
-                                                symbol=Token("__ANON_15", "String")
-                                            )
-                                        ),
-                                    ),
-                                ],
-                                body=[
-                                    IfExpr(
-                                        if_clause=IfClause(
-                                            predicate=InfixOpExpr(
-                                                lhs=Ident(
-                                                    symbol=Token("__ANON_15", "input")
-                                                ),
-                                                op=Token("__ANON_11", "!="),
-                                                rhs=Ident(
-                                                    symbol=Token("__ANON_15", "None")
-                                                ),
-                                            ),
-                                            body=[
-                                                String(
-                                                    value=Token(
-                                                        "ESCAPED_STRING",
-                                                        '"wrong format for user, got {input}"',
-                                                    )
-                                                )
-                                            ],
-                                        ),
-                                        else_if_clauses=None,
-                                        else_body=[
-                                            String(
-                                                value=Token(
-                                                    "ESCAPED_STRING",
-                                                    '"wrong format for user"',
-                                                )
-                                            )
-                                        ],
-                                    )
-                                ],
-                            )
-                        ]
-                    ),
-                    DeclError(
-                        defns=[
-                            ErrorDefn(
-                                name=Ident(symbol=Token("__ANON_16", "NotEnabled")),
-                                members=[
-                                    TypeAssign(
-                                        name=Ident(
-                                            symbol=Token("__ANON_15", "req_level")
-                                        ),
-                                        type=EnumDefn(
-                                            name=Ident(
-                                                symbol=Token("__ANON_16", "Levels")
-                                            ),
-                                            variants=[
-                                                EnumVariantUnit(
-                                                    name=Ident(
-                                                        symbol=Token(
-                                                            "__ANON_16", "Admin"
-                                                        )
-                                                    )
-                                                ),
-                                                EnumVariantUnit(
-                                                    name=Ident(
-                                                        symbol=Token(
-                                                            "__ANON_16", "Student"
-                                                        )
-                                                    )
-                                                ),
-                                            ],
-                                        ),
-                                    )
-                                ],
-                                body=[
-                                    IfExpr(
-                                        if_clause=IfClause(
-                                            predicate=InfixOpExpr(
-                                                lhs=Ident(
-                                                    symbol=Token(
-                                                        "__ANON_15", "req_level"
-                                                    )
-                                                ),
-                                                op=Token("__ANON_10", "=="),
-                                                rhs=InfixOpExpr(
-                                                    lhs=Ident(
-                                                        symbol=Token(
-                                                            "__ANON_15", "Levels"
-                                                        )
-                                                    ),
-                                                    op=Token("__ANON_14", "::"),
-                                                    rhs=Ident(
-                                                        symbol=Token(
-                                                            "__ANON_15", "Admin"
-                                                        )
-                                                    ),
-                                                ),
-                                            ),
-                                            body=[
-                                                String(
-                                                    value=Token(
-                                                        "ESCAPED_STRING",
-                                                        '"you must be an admin to access this portion"',
-                                                    )
-                                                )
-                                            ],
-                                        ),
-                                        else_if_clauses=None,
-                                        else_body=[
-                                            String(
-                                                value=Token(
-                                                    "ESCAPED_STRING",
-                                                    '"the required level is student, unfortunately"',
-                                                )
-                                            )
-                                        ],
-                                    )
-                                ],
-                            ),
-                            ErrorDefn(
-                                name=Ident(symbol=Token("__ANON_16", "Unauthorized")),
-                                members=[],
-                                body=[],
-                            ),
-                            ErrorDefn(
-                                name=Ident(
-                                    symbol=Token("__ANON_16", "InsufficientFunds")
-                                ),
-                                members=[
-                                    TypeAssign(
-                                        name=Ident(
-                                            symbol=Token("__ANON_15", "balance")
-                                        ),
-                                        type=Typename(
-                                            name=Ident(
-                                                symbol=Token("__ANON_15", "Uint128")
-                                            )
-                                        ),
-                                    ),
-                                    TypeAssign(
-                                        name=Ident(symbol=Token("__ANON_15", "needed")),
-                                        type=Typename(
-                                            name=Ident(
-                                                symbol=Token("__ANON_15", "Uint128")
-                                            )
-                                        ),
-                                    ),
-                                ],
-                                body=[
-                                    String(
-                                        value=Token(
-                                            "ESCAPED_STRING",
-                                            '"you only had {balance}, which is less than the {needed} required"',
-                                        )
-                                    )
-                                ],
-                            ),
-                        ]
-                    ),
-                    DeclEvent(
-                        defns=[
-                            EventDefn(
-                                name=Ident(symbol=Token("__ANON_16", "Action")),
-                                members=[
-                                    TypeAssign(
-                                        name=Ident(symbol=Token("__ANON_15", "method")),
-                                        type=Typename(
-                                            name=Ident(
-                                                symbol=Token("__ANON_15", "String")
-                                            )
-                                        ),
-                                    ),
-                                    TypeAssign(
-                                        name=Ident(symbol=Token("__ANON_15", "owner")),
-                                        type=Typename(
-                                            name=Ident(
-                                                symbol=Token("__ANON_15", "String")
-                                            )
-                                        ),
-                                    ),
-                                    TypeAssign(
-                                        name=Ident(symbol=Token("__ANON_15", "count")),
-                                        type=Typename(
-                                            name=Ident(
-                                                symbol=Token("__ANON_15", "String")
-                                            )
-                                        ),
-                                    ),
-                                ],
-                                body=[],
-                            )
-                        ]
-                    ),
-                    DeclEvent(
-                        defns=[
-                            EventDefn(
-                                name=Ident(symbol=Token("__ANON_16", "Increment")),
-                                members=[],
-                                body=[],
-                            ),
-                            EventDefn(
-                                name=Ident(symbol=Token("__ANON_16", "Reset")),
-                                members=[
-                                    TypeAssign(
-                                        name=Ident(symbol=Token("__ANON_15", "method")),
-                                        type=Typename(
-                                            name=Ident(
-                                                symbol=Token("__ANON_15", "String")
-                                            )
-                                        ),
-                                    )
-                                ],
-                                body=[],
-                            ),
-                        ]
-                    ),
-                    DeclState(
-                        defns=[
-                            ItemDefn(
-                                key=Ident(symbol=Token("__ANON_15", "curr_num")),
-                                type_expr=Typename(
-                                    name=Ident(symbol=Token("__ANON_15", "i32"))
-                                ),
-                            )
-                        ]
-                    ),
-                    DeclState(
-                        defns=[
-                            MapDefn(
-                                prefix=Ident(symbol=Token("__ANON_15", "balances")),
-                                type_keys=[
-                                    MapKeyDefn(
-                                        key=None,
-                                        type=Typename(
-                                            name=Ident(
-                                                symbol=Token("__ANON_15", "Addr")
-                                            )
-                                        ),
-                                    )
-                                ],
-                                type_value=Typename(
-                                    name=Ident(symbol=Token("__ANON_15", "Uint128"))
-                                ),
-                            )
-                        ]
-                    ),
-                    DeclState(
-                        defns=[
-                            ItemDefn(
-                                key=Ident(symbol=Token("__ANON_15", "config")),
-                                type_expr=StructDictDefn(
-                                    name=Ident(symbol=Token("__ANON_16", "ConfigData")),
                                     members=[
                                         TypeAssign(
+                                            annotations=None,
                                             name=Ident(
-                                                symbol=Token("__ANON_15", "owner")
+                                                symbol=Token("__ANON_16", "user")
                                             ),
                                             type=Typename(
                                                 name=Ident(
-                                                    symbol=Token("__ANON_15", "Addr")
+                                                    symbol=Token("__ANON_16", "Addr")
                                                 )
                                             ),
                                         ),
                                         TypeAssign(
+                                            annotations=None,
                                             name=Ident(
-                                                symbol=Token("__ANON_15", "count")
+                                                symbol=Token("__ANON_16", "input")
                                             ),
                                             type=Typename(
                                                 name=Ident(
-                                                    symbol=Token("__ANON_15", "i32")
-                                                )
-                                            ),
-                                        ),
-                                        TypeAssign(
-                                            name=Ident(
-                                                symbol=Token("__ANON_15", "fee_percent")
-                                            ),
-                                            type=Typename(
-                                                name=Ident(
-                                                    symbol=Token("__ANON_15", "Decimal")
+                                                    symbol=Token("__ANON_16", "String")
                                                 )
                                             ),
                                         ),
                                     ],
                                 ),
-                            ),
-                            MapDefn(
-                                prefix=Ident(
-                                    symbol=Token("__ANON_15", "token_balances")
+                            )
+                        ]
+                    ),
+                    DeclError(
+                        defns=[
+                            [
+                                ErrorDefn(
+                                    annotations=[
+                                        Annotation(
+                                            items=[
+                                                Tree(
+                                                    Token("RULE", "simple_path"),
+                                                    [
+                                                        Ident(
+                                                            symbol=Token(
+                                                                "__ANON_16",
+                                                                "annotations",
+                                                            )
+                                                        )
+                                                    ],
+                                                )
+                                            ]
+                                        )
+                                    ],
+                                    defn=EnumVariantStruct(
+                                        name=Ident(
+                                            symbol=Token("__ANON_17", "NotEnabled")
+                                        ),
+                                        members=[
+                                            TypeAssign(
+                                                annotations=None,
+                                                name=Ident(
+                                                    symbol=Token(
+                                                        "__ANON_16", "req_level"
+                                                    )
+                                                ),
+                                                type=EnumDefn(
+                                                    annotations=None,
+                                                    name=Ident(
+                                                        symbol=Token(
+                                                            "__ANON_17", "Levels"
+                                                        )
+                                                    ),
+                                                    variants=[
+                                                        EnumVariantDefn(
+                                                            annotations=Annotation(
+                                                                items=[
+                                                                    Tree(
+                                                                        Token(
+                                                                            "RULE",
+                                                                            "simple_path",
+                                                                        ),
+                                                                        [
+                                                                            Ident(
+                                                                                symbol=Token(
+                                                                                    "__ANON_16",
+                                                                                    "item",
+                                                                                )
+                                                                            )
+                                                                        ],
+                                                                    )
+                                                                ]
+                                                            ),
+                                                            variant=EnumVariantUnit(
+                                                                name=Ident(
+                                                                    symbol=Token(
+                                                                        "__ANON_17",
+                                                                        "Admin",
+                                                                    )
+                                                                )
+                                                            ),
+                                                        ),
+                                                        EnumVariantDefn(
+                                                            annotations=None,
+                                                            variant=EnumVariantUnit(
+                                                                name=Ident(
+                                                                    symbol=Token(
+                                                                        "__ANON_17",
+                                                                        "Student",
+                                                                    )
+                                                                )
+                                                            ),
+                                                        ),
+                                                    ],
+                                                ),
+                                            )
+                                        ],
+                                    ),
                                 ),
-                                type_keys=[
-                                    MapKeyDefn(
-                                        key=Ident(symbol=Token("__ANON_15", "user")),
+                                ErrorDefn(
+                                    annotations=None,
+                                    defn=EnumVariantUnit(
+                                        name=Ident(
+                                            symbol=Token("__ANON_17", "Unauthorized")
+                                        )
+                                    ),
+                                ),
+                                ErrorDefn(
+                                    annotations=None,
+                                    defn=EnumVariantStruct(
+                                        name=Ident(
+                                            symbol=Token(
+                                                "__ANON_17", "InsufficientFunds"
+                                            )
+                                        ),
+                                        members=[
+                                            TypeAssign(
+                                                annotations=None,
+                                                name=Ident(
+                                                    symbol=Token("__ANON_16", "balance")
+                                                ),
+                                                type=Typename(
+                                                    name=Ident(
+                                                        symbol=Token(
+                                                            "__ANON_16", "Uint128"
+                                                        )
+                                                    )
+                                                ),
+                                            ),
+                                            TypeAssign(
+                                                annotations=None,
+                                                name=Ident(
+                                                    symbol=Token("__ANON_16", "needed")
+                                                ),
+                                                type=Typename(
+                                                    name=Ident(
+                                                        symbol=Token(
+                                                            "__ANON_16", "Uint128"
+                                                        )
+                                                    )
+                                                ),
+                                            ),
+                                        ],
+                                    ),
+                                ),
+                            ]
+                        ]
+                    ),
+                    DeclEvent(
+                        defns=[
+                            EventDefn(
+                                annotations=None,
+                                defn=EnumVariantStruct(
+                                    name=Ident(symbol=Token("__ANON_17", "Action")),
+                                    members=[
+                                        TypeAssign(
+                                            annotations=None,
+                                            name=Ident(
+                                                symbol=Token("__ANON_16", "method")
+                                            ),
+                                            type=Typename(
+                                                name=Ident(
+                                                    symbol=Token("__ANON_16", "String")
+                                                )
+                                            ),
+                                        ),
+                                        TypeAssign(
+                                            annotations=None,
+                                            name=Ident(
+                                                symbol=Token("__ANON_16", "owner")
+                                            ),
+                                            type=Typename(
+                                                name=Ident(
+                                                    symbol=Token("__ANON_16", "String")
+                                                )
+                                            ),
+                                        ),
+                                        TypeAssign(
+                                            annotations=None,
+                                            name=Ident(
+                                                symbol=Token("__ANON_16", "count")
+                                            ),
+                                            type=Typename(
+                                                name=Ident(
+                                                    symbol=Token("__ANON_16", "String")
+                                                )
+                                            ),
+                                        ),
+                                    ],
+                                ),
+                            )
+                        ]
+                    ),
+                    DeclEvent(
+                        defns=[
+                            [
+                                EventDefn(
+                                    annotations=None,
+                                    defn=EnumVariantStruct(
+                                        name=Ident(
+                                            symbol=Token("__ANON_17", "Increment")
+                                        ),
+                                        members=None,
+                                    ),
+                                ),
+                                EventDefn(
+                                    annotations=None,
+                                    defn=EnumVariantStruct(
+                                        name=Ident(symbol=Token("__ANON_17", "Reset")),
+                                        members=[
+                                            TypeAssign(
+                                                annotations=None,
+                                                name=Ident(
+                                                    symbol=Token("__ANON_16", "method")
+                                                ),
+                                                type=Typename(
+                                                    name=Ident(
+                                                        symbol=Token(
+                                                            "__ANON_16", "String"
+                                                        )
+                                                    )
+                                                ),
+                                            )
+                                        ],
+                                    ),
+                                ),
+                            ]
+                        ]
+                    ),
+                    ItemDefn(
+                        annotations=None,
+                        key=Ident(symbol=Token("__ANON_16", "curr_num")),
+                        type=Typename(name=Ident(symbol=Token("__ANON_16", "i32"))),
+                    ),
+                    MapDefn(
+                        annotations=None,
+                        prefix=Ident(symbol=Token("__ANON_16", "balances")),
+                        keys=[
+                            MapKey(
+                                key=None,
+                                type=Typename(
+                                    name=Ident(symbol=Token("__ANON_16", "Addr"))
+                                ),
+                            )
+                        ],
+                        value=Typename(
+                            name=Ident(symbol=Token("__ANON_16", "Uint128"))
+                        ),
+                    ),
+                    [
+                        ItemDefn(
+                            annotations=None,
+                            key=Ident(symbol=Token("__ANON_16", "config")),
+                            type=StructCDefn(
+                                annotations=None,
+                                name=Ident(symbol=Token("__ANON_17", "ConfigData")),
+                                members=[
+                                    TypeAssign(
+                                        annotations=None,
+                                        name=Ident(symbol=Token("__ANON_16", "owner")),
                                         type=Typename(
                                             name=Ident(
-                                                symbol=Token("__ANON_15", "Addr")
+                                                symbol=Token("__ANON_16", "Addr")
                                             )
                                         ),
                                     ),
-                                    MapKeyDefn(
-                                        key=None,
+                                    TypeAssign(
+                                        annotations=None,
+                                        name=Ident(symbol=Token("__ANON_16", "count")),
                                         type=Typename(
-                                            name=Ident(
-                                                symbol=Token("__ANON_15", "Addr")
-                                            )
+                                            name=Ident(symbol=Token("__ANON_16", "i32"))
                                         ),
                                     ),
-                                    MapKeyDefn(
-                                        key=Ident(symbol=Token("__ANON_15", "bucket")),
+                                    TypeAssign(
+                                        annotations=None,
+                                        name=Ident(
+                                            symbol=Token("__ANON_16", "fee_percent")
+                                        ),
                                         type=Typename(
-                                            name=Ident(symbol=Token("__ANON_15", "u32"))
+                                            name=Ident(
+                                                symbol=Token("__ANON_16", "Decimal")
+                                            )
                                         ),
                                     ),
                                 ],
-                                type_value=Typename(
-                                    name=Ident(symbol=Token("__ANON_15", "Uint128"))
-                                ),
                             ),
-                        ]
-                    ),
-                    DeclInstantiate(
-                        defn=InstantiateDefn(
-                            args=[
-                                TypeAssign(
-                                    name=Ident(symbol=Token("__ANON_15", "count")),
+                        ),
+                        MapDefn(
+                            annotations=None,
+                            prefix=Ident(symbol=Token("__ANON_16", "token_balances")),
+                            keys=[
+                                MapKey(
+                                    key=Ident(symbol=Token("__ANON_16", "user")),
                                     type=Typename(
-                                        name=Ident(symbol=Token("__ANON_15", "i32"))
+                                        name=Ident(symbol=Token("__ANON_16", "Addr"))
                                     ),
                                 ),
-                                TypeAssign(
-                                    name=Ident(
-                                        symbol=Token("__ANON_15", "fee_percent")
-                                    ),
+                                MapKey(
+                                    key=None,
                                     type=Typename(
-                                        name=Ident(symbol=Token("__ANON_15", "Dec"))
+                                        name=Ident(symbol=Token("__ANON_16", "Addr"))
+                                    ),
+                                ),
+                                MapKey(
+                                    key=Ident(symbol=Token("__ANON_16", "bucket")),
+                                    type=Typename(
+                                        name=Ident(symbol=Token("__ANON_16", "u32"))
                                     ),
                                 ),
                             ],
+                            value=Typename(
+                                name=Ident(symbol=Token("__ANON_16", "Uint128"))
+                            ),
+                        ),
+                    ],
+                    DeclInstantiate(
+                        defn=InstantiateDefn(
+                            annotations=None,
+                            args=[
+                                [
+                                    TypeAssign(
+                                        annotations=None,
+                                        name=Ident(symbol=Token("__ANON_16", "count")),
+                                        type=Typename(
+                                            name=Ident(symbol=Token("__ANON_16", "i32"))
+                                        ),
+                                    ),
+                                    TypeAssign(
+                                        annotations=None,
+                                        name=Ident(
+                                            symbol=Token("__ANON_16", "fee_percent")
+                                        ),
+                                        type=Typename(
+                                            name=Ident(symbol=Token("__ANON_16", "Dec"))
+                                        ),
+                                    ),
+                                ]
+                            ],
                             body=[
                                 AssignStmt(
-                                    lhs=IdentPath(
-                                        parts=[
-                                            Ident(symbol=Token("__ANON_15", "$state")),
-                                            Ident(symbol=Token("__ANON_15", "config")),
-                                        ]
-                                    ),
-                                    assign_op="=",
-                                    rhs=StructDictVal(
-                                        name=Ident(
-                                            symbol=Token("__ANON_16", "ConfigData")
+                                    lhs=MemberAccessExpr(
+                                        item=Tree(
+                                            Token("RULE", "special_key"),
+                                            [Token("__ANON_21", "$state")],
                                         ),
-                                        members_vals=[
-                                            StructDictAssign(
+                                        member=Ident(
+                                            symbol=Token("__ANON_16", "config")
+                                        ),
+                                    ),
+                                    assign_op=Token("EQUAL", "="),
+                                    rhs=StructVal(
+                                        name=Ident(
+                                            symbol=Token("__ANON_17", "ConfigData")
+                                        ),
+                                        members=[
+                                            StructValAssign(
                                                 name=Ident(
-                                                    symbol=Token("__ANON_15", "owner")
+                                                    symbol=Token("__ANON_16", "owner")
                                                 ),
                                                 value=MemberAccessExpr(
-                                                    item=Ident(
-                                                        symbol=Token(
-                                                            "__ANON_15", "$env"
-                                                        )
+                                                    item=Tree(
+                                                        Token("RULE", "special_key"),
+                                                        [Token("__ANON_20", "$env")],
                                                     ),
                                                     member=Ident(
                                                         symbol=Token(
-                                                            "__ANON_15", "sender"
+                                                            "__ANON_16", "sender"
                                                         )
                                                     ),
                                                 ),
                                             ),
-                                            StructDictAssign(
+                                            StructValAssign(
                                                 name=Ident(
-                                                    symbol=Token("__ANON_15", "count")
+                                                    symbol=Token("__ANON_16", "count")
                                                 ),
                                                 value=Ident(
-                                                    symbol=Token("__ANON_15", "count")
+                                                    symbol=Token("__ANON_16", "count")
                                                 ),
                                             ),
-                                            StructDictAssign(
+                                            StructValAssign(
                                                 name=Ident(
                                                     symbol=Token(
-                                                        "__ANON_15", "fee_percent"
+                                                        "__ANON_16", "fee_percent"
                                                     )
                                                 ),
                                                 value=Ident(
                                                     symbol=Token(
-                                                        "__ANON_15", "fee_percent"
+                                                        "__ANON_16", "fee_percent"
                                                     )
                                                 ),
                                             ),
@@ -413,8 +424,13 @@ FileCode(
                                 ),
                                 EmitStmt(
                                     expr=FnCallExpr(
-                                        fn_name=Ident(
-                                            symbol=Token("__ANON_15", "Action")
+                                        fn_name=Tree(
+                                            Token("RULE", "simple_path"),
+                                            [
+                                                Ident(
+                                                    symbol=Token("__ANON_16", "Action")
+                                                )
+                                            ],
                                         ),
                                         args=[
                                             String(
@@ -423,14 +439,15 @@ FileCode(
                                                 )
                                             ),
                                             MemberAccessExpr(
-                                                item=Ident(
-                                                    symbol=Token("__ANON_15", "$env")
+                                                item=Tree(
+                                                    Token("RULE", "special_key"),
+                                                    [Token("__ANON_20", "$env")],
                                                 ),
                                                 member=Ident(
-                                                    symbol=Token("__ANON_15", "sender")
+                                                    symbol=Token("__ANON_16", "sender")
                                                 ),
                                             ),
-                                            Ident(symbol=Token("__ANON_15", "count")),
+                                            Ident(symbol=Token("__ANON_16", "count")),
                                         ],
                                     )
                                 ),
@@ -440,31 +457,46 @@ FileCode(
                     DeclExec(
                         defns=[
                             ExecDefn(
+                                annotations=None,
                                 name=Ident(
-                                    symbol=Token("__ANON_15", "msg_name_snake_case")
+                                    symbol=Token("__ANON_16", "msg_name_snake_case")
                                 ),
                                 args=[
-                                    TypeAssign(
-                                        name=Ident(symbol=Token("__ANON_15", "arg1")),
-                                        type=Typename(
-                                            name=Ident(symbol=Token("__ANON_15", "u32"))
-                                        ),
-                                    ),
-                                    TypeAssign(
-                                        name=Ident(symbol=Token("__ANON_15", "arg2")),
-                                        type=ParamzdTypeExpr(
-                                            base_type=Typename(
-                                                name=Ident(
-                                                    symbol=Token("__ANON_15", "Option")
-                                                )
+                                    [
+                                        TypeAssign(
+                                            annotations=None,
+                                            name=Ident(
+                                                symbol=Token("__ANON_16", "arg1")
                                             ),
-                                            param=Typename(
+                                            type=Typename(
                                                 name=Ident(
-                                                    symbol=Token("__ANON_15", "String")
+                                                    symbol=Token("__ANON_16", "u32")
                                                 )
                                             ),
                                         ),
-                                    ),
+                                        TypeAssign(
+                                            annotations=None,
+                                            name=Ident(
+                                                symbol=Token("__ANON_16", "arg2")
+                                            ),
+                                            type=ParamzdTypeExpr(
+                                                base_type=Typename(
+                                                    name=Ident(
+                                                        symbol=Token(
+                                                            "__ANON_16", "Option"
+                                                        )
+                                                    )
+                                                ),
+                                                param=Typename(
+                                                    name=Ident(
+                                                        symbol=Token(
+                                                            "__ANON_16", "String"
+                                                        )
+                                                    )
+                                                ),
+                                            ),
+                                        ),
+                                    ]
                                 ],
                                 body=[],
                             )
@@ -472,158 +504,323 @@ FileCode(
                     ),
                     DeclExec(
                         defns=[
-                            ExecDefn(
-                                name=Ident(symbol=Token("__ANON_15", "increment")),
-                                args=[],
-                                body=[
-                                    AssignStmt(
-                                        lhs=IdentPath(
-                                            parts=[
-                                                Ident(
-                                                    symbol=Token("__ANON_15", "$state")
-                                                ),
-                                                Ident(
-                                                    symbol=Token("__ANON_15", "config")
-                                                ),
-                                                Ident(
-                                                    symbol=Token("__ANON_15", "count")
-                                                ),
-                                            ]
-                                        ),
-                                        assign_op="+=",
-                                        rhs=Integer(value=Token("__ANON_19", "1")),
-                                    )
-                                ],
-                            ),
-                            ExecDefn(
-                                name=Ident(symbol=Token("__ANON_15", "reset")),
-                                args=[
-                                    TypeAssign(
-                                        name=Ident(symbol=Token("__ANON_15", "count")),
-                                        type=Typename(
-                                            name=Ident(symbol=Token("__ANON_15", "i32"))
-                                        ),
-                                    )
-                                ],
-                                body=[
-                                    IfExpr(
-                                        if_clause=IfClause(
-                                            predicate=MemberAccessExpr(
+                            [
+                                ExecDefn(
+                                    annotations=None,
+                                    name=Ident(symbol=Token("__ANON_16", "increment")),
+                                    args=[None],
+                                    body=[
+                                        AssignStmt(
+                                            lhs=MemberAccessExpr(
                                                 item=MemberAccessExpr(
-                                                    item=InfixOpExpr(
-                                                        lhs=MemberAccessExpr(
-                                                            item=Ident(
-                                                                symbol=Token(
-                                                                    "__ANON_15", "$env"
-                                                                )
+                                                    item=Tree(
+                                                        Token("RULE", "special_key"),
+                                                        [Token("__ANON_21", "$state")],
+                                                    ),
+                                                    member=Ident(
+                                                        symbol=Token(
+                                                            "__ANON_16", "config"
+                                                        )
+                                                    ),
+                                                ),
+                                                member=Ident(
+                                                    symbol=Token("__ANON_16", "count")
+                                                ),
+                                            ),
+                                            assign_op=Token("__ANON_4", "+="),
+                                            rhs=Integer(value=Token("__ANON_23", "1")),
+                                        ),
+                                        IfExpr(
+                                            if_clause=IfClause(
+                                                predicate=InfixOpExpr(
+                                                    lhs=MemberAccessExpr(
+                                                        item=MemberAccessExpr(
+                                                            item=Tree(
+                                                                Token(
+                                                                    "RULE",
+                                                                    "special_key",
+                                                                ),
+                                                                [
+                                                                    Token(
+                                                                        "__ANON_21",
+                                                                        "$state",
+                                                                    )
+                                                                ],
                                                             ),
                                                             member=Ident(
                                                                 symbol=Token(
-                                                                    "__ANON_15",
-                                                                    "sender",
+                                                                    "__ANON_16",
+                                                                    "config",
                                                                 )
                                                             ),
                                                         ),
-                                                        op=Token("__ANON_11", "!="),
-                                                        rhs=Ident(
+                                                        member=Ident(
                                                             symbol=Token(
-                                                                "__ANON_15", "$state"
+                                                                "__ANON_16", "count"
+                                                            )
+                                                        ),
+                                                    ),
+                                                    op=Token("LESSTHAN", "<"),
+                                                    rhs=Integer(
+                                                        value=Token("__ANON_23", "2")
+                                                    ),
+                                                ),
+                                                body=[
+                                                    StructVal(
+                                                        name=Ident(
+                                                            symbol=Token(
+                                                                "__ANON_17", "Intensity"
+                                                            )
+                                                        ),
+                                                        members=[
+                                                            StructValAssign(
+                                                                name=Ident(
+                                                                    symbol=Token(
+                                                                        "__ANON_16",
+                                                                        "item",
+                                                                    )
+                                                                ),
+                                                                value=Integer(
+                                                                    value=Token(
+                                                                        "__ANON_23",
+                                                                        "23",
+                                                                    )
+                                                                ),
+                                                            ),
+                                                            StructValAssign(
+                                                                name=Ident(
+                                                                    symbol=Token(
+                                                                        "__ANON_16",
+                                                                        "power23",
+                                                                    )
+                                                                ),
+                                                                value=Integer(
+                                                                    value=Token(
+                                                                        "__ANON_23",
+                                                                        "722391",
+                                                                    )
+                                                                ),
+                                                            ),
+                                                            StructValAssign(
+                                                                name=Ident(
+                                                                    symbol=Token(
+                                                                        "__ANON_16",
+                                                                        "my_power",
+                                                                    )
+                                                                ),
+                                                                value=FnCallExpr(
+                                                                    fn_name=Tree(
+                                                                        Token(
+                                                                            "RULE",
+                                                                            "simple_path",
+                                                                        ),
+                                                                        [
+                                                                            Ident(
+                                                                                symbol=Token(
+                                                                                    "__ANON_16",
+                                                                                    "ally",
+                                                                                )
+                                                                            )
+                                                                        ],
+                                                                    ),
+                                                                    args=[
+                                                                        String(
+                                                                            value=Token(
+                                                                                "ESCAPED_STRING",
+                                                                                '"call"',
+                                                                            )
+                                                                        ),
+                                                                        Integer(
+                                                                            value=Token(
+                                                                                "__ANON_23",
+                                                                                "12",
+                                                                            )
+                                                                        ),
+                                                                    ],
+                                                                ),
+                                                            ),
+                                                        ],
+                                                    )
+                                                ],
+                                            ),
+                                            else_if_clauses=None,
+                                            else_body=None,
+                                        ),
+                                    ],
+                                ),
+                                ExecDefn(
+                                    annotations=None,
+                                    name=Ident(symbol=Token("__ANON_16", "reset")),
+                                    args=[
+                                        [
+                                            TypeAssign(
+                                                annotations=None,
+                                                name=Ident(
+                                                    symbol=Token("__ANON_16", "count")
+                                                ),
+                                                type=Typename(
+                                                    name=Ident(
+                                                        symbol=Token("__ANON_16", "i32")
+                                                    )
+                                                ),
+                                            )
+                                        ]
+                                    ],
+                                    body=[
+                                        IfExpr(
+                                            if_clause=IfClause(
+                                                predicate=MemberAccessExpr(
+                                                    item=MemberAccessExpr(
+                                                        item=InfixOpExpr(
+                                                            lhs=MemberAccessExpr(
+                                                                item=Tree(
+                                                                    Token(
+                                                                        "RULE",
+                                                                        "special_key",
+                                                                    ),
+                                                                    [
+                                                                        Token(
+                                                                            "__ANON_20",
+                                                                            "$env",
+                                                                        )
+                                                                    ],
+                                                                ),
+                                                                member=Ident(
+                                                                    symbol=Token(
+                                                                        "__ANON_16",
+                                                                        "sender",
+                                                                    )
+                                                                ),
+                                                            ),
+                                                            op=Token("__ANON_12", "!="),
+                                                            rhs=Tree(
+                                                                Token(
+                                                                    "RULE",
+                                                                    "special_key",
+                                                                ),
+                                                                [
+                                                                    Token(
+                                                                        "__ANON_21",
+                                                                        "$state",
+                                                                    )
+                                                                ],
+                                                            ),
+                                                        ),
+                                                        member=Ident(
+                                                            symbol=Token(
+                                                                "__ANON_16", "config"
                                                             )
                                                         ),
                                                     ),
                                                     member=Ident(
                                                         symbol=Token(
-                                                            "__ANON_15", "config"
+                                                            "__ANON_16", "owner"
+                                                        )
+                                                    ),
+                                                ),
+                                                body=[
+                                                    FailStmt(
+                                                        expr=Ident(
+                                                            symbol=Token(
+                                                                "__ANON_16",
+                                                                "Unauthorized",
+                                                            )
+                                                        )
+                                                    )
+                                                ],
+                                            ),
+                                            else_if_clauses=None,
+                                            else_body=None,
+                                        ),
+                                        AssignStmt(
+                                            lhs=MemberAccessExpr(
+                                                item=MemberAccessExpr(
+                                                    item=Tree(
+                                                        Token("RULE", "special_key"),
+                                                        [Token("__ANON_21", "$state")],
+                                                    ),
+                                                    member=Ident(
+                                                        symbol=Token(
+                                                            "__ANON_16", "config"
                                                         )
                                                     ),
                                                 ),
                                                 member=Ident(
-                                                    symbol=Token("__ANON_15", "owner")
+                                                    symbol=Token("__ANON_16", "count")
                                                 ),
                                             ),
-                                            body=[
-                                                FailStmt(
-                                                    expr=Ident(
-                                                        symbol=Token(
-                                                            "__ANON_15", "Unauthorized"
-                                                        )
-                                                    )
-                                                )
-                                            ],
+                                            assign_op=Token("EQUAL", "="),
+                                            rhs=Ident(
+                                                symbol=Token("__ANON_16", "count")
+                                            ),
                                         ),
-                                        else_if_clauses=None,
-                                        else_body=None,
-                                    ),
-                                    AssignStmt(
-                                        lhs=IdentPath(
-                                            parts=[
-                                                Ident(
-                                                    symbol=Token("__ANON_15", "$state")
-                                                ),
-                                                Ident(
-                                                    symbol=Token("__ANON_15", "config")
-                                                ),
-                                                Ident(
-                                                    symbol=Token("__ANON_15", "count")
-                                                ),
-                                            ]
-                                        ),
-                                        assign_op="=",
-                                        rhs=Ident(symbol=Token("__ANON_15", "count")),
-                                    ),
-                                ],
-                            ),
+                                    ],
+                                ),
+                            ]
                         ]
                     ),
                     DeclQuery(
                         defns=[
                             QueryDefnFn(
-                                name=Ident(symbol=Token("__ANON_15", "count")),
-                                args=[],
-                                response_type=StructDictDefn(
+                                annotations=None,
+                                name=Ident(symbol=Token("__ANON_16", "count")),
+                                args=[None],
+                                response_type=StructCDefn(
+                                    annotations=None,
                                     name=Ident(
-                                        symbol=Token("__ANON_16", "CountResponse")
+                                        symbol=Token("__ANON_17", "CountResponse")
                                     ),
                                     members=[
                                         TypeAssign(
+                                            annotations=None,
                                             name=Ident(
-                                                symbol=Token("__ANON_15", "count")
+                                                symbol=Token("__ANON_16", "count")
                                             ),
                                             type=Typename(
                                                 name=Ident(
-                                                    symbol=Token("__ANON_15", "i32")
+                                                    symbol=Token("__ANON_16", "i32")
                                                 )
                                             ),
                                         )
                                     ],
                                 ),
                                 body=[
-                                    StructDictVal(
+                                    StructVal(
                                         name=Ident(
-                                            symbol=Token("__ANON_16", "CountResponse")
+                                            symbol=Token("__ANON_17", "CountResponse")
                                         ),
-                                        members_vals=StructDictAssign(
-                                            name=Ident(
-                                                symbol=Token("__ANON_15", "count")
-                                            ),
-                                            value=MemberAccessExpr(
-                                                item=MemberAccessExpr(
-                                                    item=Ident(
-                                                        symbol=Token(
-                                                            "__ANON_15", "$state"
-                                                        )
+                                        members=[
+                                            StructValAssign(
+                                                name=Ident(
+                                                    symbol=Token("__ANON_16", "count")
+                                                ),
+                                                value=MemberAccessExpr(
+                                                    item=MemberAccessExpr(
+                                                        item=Tree(
+                                                            Token(
+                                                                "RULE", "special_key"
+                                                            ),
+                                                            [
+                                                                Token(
+                                                                    "__ANON_21",
+                                                                    "$state",
+                                                                )
+                                                            ],
+                                                        ),
+                                                        member=Ident(
+                                                            symbol=Token(
+                                                                "__ANON_16", "config"
+                                                            )
+                                                        ),
                                                     ),
                                                     member=Ident(
                                                         symbol=Token(
-                                                            "__ANON_15", "config"
+                                                            "__ANON_16", "count"
                                                         )
                                                     ),
                                                 ),
-                                                member=Ident(
-                                                    symbol=Token("__ANON_15", "count")
-                                                ),
-                                            ),
-                                        ),
+                                            )
+                                        ],
                                     )
                                 ],
                             )
@@ -632,204 +829,288 @@ FileCode(
                     DeclQuery(
                         defns=[
                             QueryDefnResponds(
+                                annotations=None,
                                 name=Ident(
-                                    symbol=Token("__ANON_15", "user_balance_for_token")
+                                    symbol=Token("__ANON_16", "user_balance_for_token")
                                 ),
                                 args=[
-                                    TypeAssign(
-                                        name=Ident(symbol=Token("__ANON_15", "user")),
-                                        type=Typename(
+                                    [
+                                        TypeAssign(
+                                            annotations=None,
                                             name=Ident(
-                                                symbol=Token("__ANON_15", "Addr")
-                                            )
+                                                symbol=Token("__ANON_16", "user")
+                                            ),
+                                            type=Typename(
+                                                name=Ident(
+                                                    symbol=Token("__ANON_16", "Addr")
+                                                )
+                                            ),
                                         ),
-                                    ),
-                                    TypeAssign(
-                                        name=Ident(symbol=Token("__ANON_15", "token")),
-                                        type=Typename(
+                                        TypeAssign(
+                                            annotations=None,
                                             name=Ident(
-                                                symbol=Token("__ANON_15", "Addr")
-                                            )
+                                                symbol=Token("__ANON_16", "token")
+                                            ),
+                                            type=Typename(
+                                                name=Ident(
+                                                    symbol=Token("__ANON_16", "Addr")
+                                                )
+                                            ),
                                         ),
-                                    ),
+                                    ]
                                 ],
-                                response_defn=QueryResponseDefn(
-                                    body=[
-                                        TypeAssignAndSet(
-                                            type_assign=TypeAssign(
-                                                name=Ident(
-                                                    symbol=Token("__ANON_15", "user")
-                                                ),
-                                                type=Typename(
-                                                    name=Ident(
-                                                        symbol=Token(
-                                                            "__ANON_15", "Addr"
+                                response_defn=[
+                                    TypeAssignAndSet(
+                                        type_assign=TypeAssign(
+                                            annotations=[
+                                                Annotation(
+                                                    items=[
+                                                        FnCallExpr(
+                                                            fn_name=Tree(
+                                                                Token(
+                                                                    "RULE",
+                                                                    "simple_path",
+                                                                ),
+                                                                [
+                                                                    Ident(
+                                                                        symbol=Token(
+                                                                            "__ANON_16",
+                                                                            "echo",
+                                                                        )
+                                                                    )
+                                                                ],
+                                                            ),
+                                                            args=[
+                                                                String(
+                                                                    value=Token(
+                                                                        "ESCAPED_STRING",
+                                                                        '"hello"',
+                                                                    )
+                                                                )
+                                                            ],
                                                         )
-                                                    )
-                                                ),
+                                                    ]
+                                                )
+                                            ],
+                                            name=Ident(
+                                                symbol=Token("__ANON_16", "user")
                                             ),
-                                            value=Ident(
-                                                symbol=Token("__ANON_15", "user")
+                                            type=Typename(
+                                                name=Ident(
+                                                    symbol=Token("__ANON_16", "Addr")
+                                                )
                                             ),
                                         ),
-                                        TypeAssignAndSet(
-                                            type_assign=TypeAssign(
-                                                name=Ident(
-                                                    symbol=Token("__ANON_15", "token")
-                                                ),
-                                                type=Typename(
-                                                    name=Ident(
-                                                        symbol=Token(
-                                                            "__ANON_15", "Addr"
+                                        value=Ident(symbol=Token("__ANON_16", "user")),
+                                    ),
+                                    TypeAssignAndSet(
+                                        type_assign=TypeAssign(
+                                            annotations=[
+                                                Annotation(
+                                                    items=[
+                                                        FnCallExpr(
+                                                            fn_name=Tree(
+                                                                Token(
+                                                                    "RULE",
+                                                                    "simple_path",
+                                                                ),
+                                                                [
+                                                                    Ident(
+                                                                        symbol=Token(
+                                                                            "__ANON_16",
+                                                                            "derive",
+                                                                        )
+                                                                    )
+                                                                ],
+                                                            ),
+                                                            args=[
+                                                                Ident(
+                                                                    symbol=Token(
+                                                                        "__ANON_16",
+                                                                        "Sata",
+                                                                    )
+                                                                ),
+                                                                Ident(
+                                                                    symbol=Token(
+                                                                        "__ANON_16",
+                                                                        "ansdf",
+                                                                    )
+                                                                ),
+                                                            ],
                                                         )
-                                                    )
-                                                ),
+                                                    ]
+                                                )
+                                            ],
+                                            name=Ident(
+                                                symbol=Token("__ANON_16", "token")
                                             ),
-                                            value=Ident(
-                                                symbol=Token("__ANON_15", "token")
+                                            type=Typename(
+                                                name=Ident(
+                                                    symbol=Token("__ANON_16", "Addr")
+                                                )
                                             ),
                                         ),
-                                        TypeAssignAndSet(
-                                            type_assign=TypeAssign(
-                                                name=Ident(
-                                                    symbol=Token("__ANON_15", "balance")
-                                                ),
-                                                type=Typename(
-                                                    name=Ident(
-                                                        symbol=Token(
-                                                            "__ANON_15", "Uint128"
-                                                        )
-                                                    )
-                                                ),
+                                        value=Ident(symbol=Token("__ANON_16", "token")),
+                                    ),
+                                    TypeAssignAndSet(
+                                        type_assign=TypeAssign(
+                                            annotations=None,
+                                            name=Ident(
+                                                symbol=Token("__ANON_16", "balance")
                                             ),
-                                            value=TableLookupExpr(
+                                            type=Typename(
+                                                name=Ident(
+                                                    symbol=Token("__ANON_16", "Uint128")
+                                                )
+                                            ),
+                                        ),
+                                        value=TableLookupExpr(
+                                            item=TableLookupExpr(
                                                 item=TableLookupExpr(
-                                                    item=TableLookupExpr(
-                                                        item=MemberAccessExpr(
-                                                            item=Ident(
-                                                                symbol=Token(
-                                                                    "__ANON_15",
+                                                    item=MemberAccessExpr(
+                                                        item=Tree(
+                                                            Token(
+                                                                "RULE", "special_key"
+                                                            ),
+                                                            [
+                                                                Token(
+                                                                    "__ANON_21",
                                                                     "$state",
                                                                 )
-                                                            ),
-                                                            member=Ident(
-                                                                symbol=Token(
-                                                                    "__ANON_15",
-                                                                    "token_balances",
-                                                                )
-                                                            ),
+                                                            ],
                                                         ),
-                                                        key=Ident(
+                                                        member=Ident(
                                                             symbol=Token(
-                                                                "__ANON_15", "user"
+                                                                "__ANON_16",
+                                                                "token_balances",
                                                             )
                                                         ),
                                                     ),
                                                     key=Ident(
                                                         symbol=Token(
-                                                            "__ANON_15", "token"
+                                                            "__ANON_16", "user"
                                                         )
                                                     ),
                                                 ),
-                                                key=Integer(
-                                                    value=Token("__ANON_19", "1")
+                                                key=Ident(
+                                                    symbol=Token("__ANON_16", "token")
                                                 ),
                                             ),
+                                            key=Integer(value=Token("__ANON_23", "1")),
                                         ),
-                                    ]
-                                ),
+                                    ),
+                                ],
                             )
                         ]
                     ),
                     DeclQuery(
                         defns=[
                             QueryDefnFn(
+                                annotations=None,
                                 name=Ident(
-                                    symbol=Token("__ANON_15", "user_balance_for_token")
+                                    symbol=Token("__ANON_16", "user_balance_for_token")
                                 ),
                                 args=[
-                                    TypeAssign(
-                                        name=Ident(symbol=Token("__ANON_15", "user")),
-                                        type=Typename(
+                                    [
+                                        TypeAssign(
+                                            annotations=None,
                                             name=Ident(
-                                                symbol=Token("__ANON_15", "Addr")
-                                            )
+                                                symbol=Token("__ANON_16", "user")
+                                            ),
+                                            type=Typename(
+                                                name=Ident(
+                                                    symbol=Token("__ANON_16", "Addr")
+                                                )
+                                            ),
                                         ),
-                                    ),
-                                    TypeAssign(
-                                        name=Ident(symbol=Token("__ANON_15", "token")),
-                                        type=Typename(
+                                        TypeAssign(
+                                            annotations=None,
                                             name=Ident(
-                                                symbol=Token("__ANON_15", "Addr")
-                                            )
+                                                symbol=Token("__ANON_16", "token")
+                                            ),
+                                            type=Typename(
+                                                name=Ident(
+                                                    symbol=Token("__ANON_16", "Addr")
+                                                )
+                                            ),
                                         ),
-                                    ),
+                                    ]
                                 ],
-                                response_type=StructDictDefn(
+                                response_type=StructCDefn(
+                                    annotations=None,
                                     name=Ident(
                                         symbol=Token(
-                                            "__ANON_16", "UserBalanceForTokenResponse"
+                                            "__ANON_17", "UserBalanceForTokenResponse"
                                         )
                                     ),
                                     members=[
                                         TypeAssign(
+                                            annotations=None,
                                             name=Ident(
-                                                symbol=Token("__ANON_15", "balance")
+                                                symbol=Token("__ANON_16", "balance")
                                             ),
                                             type=Typename(
                                                 name=Ident(
-                                                    symbol=Token("__ANON_15", "Uint128")
+                                                    symbol=Token("__ANON_16", "Uint128")
                                                 )
                                             ),
                                         )
                                     ],
                                 ),
                                 body=[
-                                    StructDictVal(
+                                    StructVal(
                                         name=Ident(
                                             symbol=Token(
-                                                "__ANON_16",
+                                                "__ANON_17",
                                                 "UserBalanceForTokenResponse",
                                             )
                                         ),
-                                        members_vals=StructDictAssign(
-                                            name=Ident(
-                                                symbol=Token("__ANON_15", "balance")
-                                            ),
-                                            value=TableLookupExpr(
-                                                item=TableLookupExpr(
+                                        members=[
+                                            StructValAssign(
+                                                name=Ident(
+                                                    symbol=Token("__ANON_16", "balance")
+                                                ),
+                                                value=TableLookupExpr(
                                                     item=TableLookupExpr(
-                                                        item=MemberAccessExpr(
-                                                            item=Ident(
-                                                                symbol=Token(
-                                                                    "__ANON_15",
-                                                                    "$state",
-                                                                )
+                                                        item=TableLookupExpr(
+                                                            item=MemberAccessExpr(
+                                                                item=Tree(
+                                                                    Token(
+                                                                        "RULE",
+                                                                        "special_key",
+                                                                    ),
+                                                                    [
+                                                                        Token(
+                                                                            "__ANON_21",
+                                                                            "$state",
+                                                                        )
+                                                                    ],
+                                                                ),
+                                                                member=Ident(
+                                                                    symbol=Token(
+                                                                        "__ANON_16",
+                                                                        "token_balances",
+                                                                    )
+                                                                ),
                                                             ),
-                                                            member=Ident(
+                                                            key=Ident(
                                                                 symbol=Token(
-                                                                    "__ANON_15",
-                                                                    "token_balances",
+                                                                    "__ANON_16", "user"
                                                                 )
                                                             ),
                                                         ),
                                                         key=Ident(
                                                             symbol=Token(
-                                                                "__ANON_15", "user"
+                                                                "__ANON_16", "token"
                                                             )
                                                         ),
                                                     ),
-                                                    key=Ident(
-                                                        symbol=Token(
-                                                            "__ANON_15", "token"
-                                                        )
+                                                    key=Integer(
+                                                        value=Token("__ANON_23", "1")
                                                     ),
                                                 ),
-                                                key=Integer(
-                                                    value=Token("__ANON_19", "1")
-                                                ),
-                                            ),
-                                        ),
+                                            )
+                                        ],
                                     )
                                 ],
                             )

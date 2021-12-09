@@ -2,29 +2,15 @@
 // contract definition block
 contract CW20 {
 	// declare a single error
-	error ImproperFormat(user: Addr, input: String) {
-		if input != None {
-			"wrong format for user, got {input}"
-		} else {
-			"wrong format for user"
-		}
-	}
+	error ImproperFormat(user: Addr, input: String)
 
 	// define multiple error definitions using an 'errors' block
 	errors {
 		// you can now omit the prefixing 'error' keyword
-		NotEnabled(req_level: enum Levels { Admin, Student }) {
-			if req_level == Levels::Admin {
-				"you must be an admin to access this portion"
-			} else {
-				"the required level is student, unfortunately"
-			}
-		},
+		#[annotations]
+		NotEnabled(req_level: enum Levels { #[item] Admin, Student }),
 		Unauthorized, // both args () and body {} can be omitted if not needed
-		InsufficientFunds(balance: Uint128, needed: Uint128) {
-			// use string interpolation
-			"you only had {balance}, which is less than the {needed} required"
-		}
+		InsufficientFunds(balance: Uint128, needed: Uint128)
 	}
 
 	// declare a single event type
@@ -76,6 +62,13 @@ contract CW20 {
 	exec { // you could also do it like this
 		increment() {
 			$state.config.count += 1
+			if ( $state.config.count ) < 2 {
+				Intensity {
+					item: 23,
+					power23: 722391,
+					my_power: ally("call", 12)
+				}
+			}
 		}
 
 		reset(count: i32) {
@@ -93,8 +86,8 @@ contract CW20 {
 
 	// however, we can use another pattern...
 	query user_balance_for_token(user: Addr, token: Addr) responds {
-		user: Addr = user,
-		token: Addr = token,
+		#[echo("hello")] user: Addr = user,
+		#[derive(Sata, ansdf)] token: Addr = token,
 		balance: Uint128 = $state.token_balances[user][token][1],
 	}
 

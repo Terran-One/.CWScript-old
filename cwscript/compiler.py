@@ -36,34 +36,40 @@ class CWScriptCompiler:
             with open(s, "r") as src_file:
                 ast = parse_cwscript_src(src_file.read())
                 file_codes.append(ast)
-        
+
         contract_models = []
         for fc in file_codes:
             for stmt in fc.body:
                 if isinstance(stmt, DeclContract):
                     contract_models.append(ContractModel.from_ast(stmt.defn))
-        
+
         if len(contract_models) > 1:
             pass
         else:
             pass
 
-    def generate_crate(self, contract_model: ContractModel, target_dir: PathLike, crate_name: str = None):
+    def generate_crate(
+        self,
+        contract_model: ContractModel,
+        target_dir: PathLike,
+        crate_name: str = None,
+    ):
         if crate_name is None:
             crate_name = camel_to_snake(contract_model.name)
         out_dir = self._getpath(target_dir)
-        
+
         # create output dir
         os.makedirs(out_dir, exist_ok=True)
         os.makedirs(out_dir / "src", exist_ok=True)
         os.makedirs(out_dir / ".cargo", exist_ok=True)
-        
+
         # create Cargo.toml
-        render_to_file(templates["Cargo.toml"], out_dir / "Cargo.toml", crate_name=crate_name)
+        render_to_file(
+            templates["Cargo.toml"], out_dir / "Cargo.toml", crate_name=crate_name
+        )
         # .gitignore
         render_to_file(templates[".gitignore"], out_dir / ".gitignore")
         # rustfmt.toml
         render_to_file(templates["rustfmt.toml"], out_dir / "rustfmt.toml")
         # .cargo/config
         render_to_file(templates[".cargo/config"], out_dir / ".cargo/config")
-        

@@ -1,30 +1,34 @@
 from cwscript.util.context_env import Context, Env
 from cwscript.template import codegen_templates as templates
-from cwscript.lang.ast import _QueryDefn
+from cwscript.lang.ast import _QueryDefn, StructDefn
 from cwscript.lang.ast import *
-from cwscript.util.strings import pascal_to_snake, snake_to_pascal 
+from cwscript.util.strings import pascal_to_snake, snake_to_pascal
+
 
 class CGContext(Context):
     pass
 
+
 class CGEnv(Env):
     pass
 
+
 class ContractCodegen:
-    
     def __init__(self, contract_defn: ContractDefn):
         self.defn = contract_defn
-        self.errors = self.defn.collect_type(ErrorDefn)    
+        self.errors = self.defn.collect_type(ErrorDefn)
         self.events = self.defn.collect_type(EventDefn)
         self.instantiate = self.defn.collect_type(InstantiateDefn)
         self.exec = self.defn.collect_type(ExecDefn)
         self.query = self.defn.collect_type(QueryDefnFn)
-        self.query.extend(x.to_query_defn_fn() for x in self.defn.collect_type(QueryDefnResponds))
-        self.structs = self.defn.collect_type(StructDictDefn)
-        self.enums = self.defn.collect_type(StructDictDefn)
-    
+        self.query.extend(
+            x.to_query_defn_fn() for x in self.defn.collect_type(QueryDefnResponds)
+        )
+        self.structs = self.defn.collect_type(StructDefn)
+        self.enums = self.defn.collect_type(EnumDefn)
+
     def gen_contract(self) -> str:
-        return templates['contract'].render(contract=self)
+        return templates["contract"].render(contract=self)
 
 
 class ICodegen:
@@ -66,6 +70,7 @@ def render(template_name: str, **kwargs):
     template = templates[template_name]
     return template.render(**kwargs)
 
+
 class CGStructDefn(ICodegen):
     """Subclass inside a StructDefn-like `_Ast` node to add codegen."""
 
@@ -77,6 +82,7 @@ class CGStructDefn(ICodegen):
 
     def _gen_code(self, env: CGEnv) -> str:
         return render("struct_defn", struct=self, env=env)
+
 
 def iis(test, *types) -> bool:
     """Returns `True` if `isinstance(test, t)` works for ANY `t` in `types`"""

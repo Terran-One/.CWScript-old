@@ -1,18 +1,19 @@
 from typing import Callable, List, Optional, Union, Any
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 from lark import ast_utils, Transformer
 from lark.lexer import Token
 
 from cwscript.util.strings import pascal_to_snake, snake_to_pascal
 
+
 def iis(test, *types: list) -> bool:
     """Returns `True` if `isinstance(test, t)` works for ANY `t` in `types`"""
     return any(isinstance(test, t) for t in types)
 
+
 ## AST Nodes
 class _Ast(ast_utils.Ast):
-    
     def collect(self, predicate: Callable[[Any], bool], *, dfs: bool = True) -> list:
         """Gets children for which the provided predicate returns True."""
         nodes = []
@@ -39,63 +40,46 @@ class _Ast(ast_utils.Ast):
                         if iis(elem, _Ast):
                             nodes.extend(elem.collect(predicate, dfs=False))
         return nodes
-    
-    def collect_with_depth(self, predicate, *, dfs: bool = True) -> dict:
-        nodes = {}
-        
-        for (key, child) in self.__dict__.items():
-            if predicate(child):
-                nodes[key] = child
-            if dfs:
-                if iis(child, _Ast):
-                    matches = child.collect_with_depth(predicate, dfs=False)
-                    if len(matches) > 0:
-                        nodes[key] = matches
-                elif iis(child, list, tuple):
-                    nodes[key] = {}
-                    for (i, elem) in enumerate(child):
-                        if predicate(elem):
-                            nodes[key][str(i)] = elem
-                        elif iis(elem, _Ast):
-                            matches = elem.collect_with_depth(predicate, dfs=True)
-                            if len(matches) > 0:
-                                nodes[key][str(i)] = matches
-        if not dfs:
-            # process subnodes after all children
-            for (key, child) in self.__dict__.items():
-                if iis(child, _Ast):
-                    matches = child.collect_with_depth(predicate, dfs=False)
-                    if len(matches) > 0:
-                        nodes[key] = matches
-                elif iis(child, list, tuple):
-                    nodes[key] = {}
-                    for (i, elem) in enumerate(child):
-                        if predicate(elem):
-                            nodes[key][str(i)]= elem
-                        elif iis(elem, _Ast):
-                            matches = elem.collect_with_depth(predicate, dfs=False)
-                            if len(matches) > 0:
-                                nodes[key][str(i)] = matches
-        return nodes
 
     def collect_type(self, *types, **kwargs):
         return self.collect(lambda x: iis(x, *types), **kwargs)
-    
+
     def contains_type(self, *types, **kwargs):
         return len(self.collect(lambda x: iis(x, *types), **kwargs)) > 0
-    
+
     def __contains__(self, _type) -> bool:
         """Alias for the 'in' operator."""
+        if iis(_type, list, tuple):
+            return self.contains_type(*_type)
         return self.contains_type(_type)
-            
+
+@dataclass
+class Ident(_Ast):
+    symbol: Token
+
+    def to_pascal(self) -> "Ident":
+        return Ident(snake_to_pascal(str(self.symbol)))
+
+    def to_snake(self) -> "Ident":
+        return Ident(pascal_to_snake(str(self.symbol)))
+
+    def __str__(self) -> str:
+        return str(self.symbol)
+
 
 class _Stmt(_Ast):
     pass
 
-
 class _Expr(_Ast):
     pass
 
+@dataclass
+class Annotation(_Ast):
+    items: list
+
+@dataclass
+class _Defn(_Ast):
+    annotations: Optional[List[Annotation]]
 
 @dataclass
 class FileCode(_Ast, ast_utils.AsList):
@@ -107,7 +91,6 @@ class _ContractStmt(_Ast):
 
 
 class _DeclStmt(_Ast):
-    
     class Types:
         CONTRACT = "contract"
         ERROR = "error"
@@ -121,30 +104,39 @@ class _DeclStmt(_Ast):
 
 
 @dataclass
-class ContractDefn(_Ast):
+class ContractDefn(_Defn):
     name: str
     body: List[_ContractStmt]
+
 
 @dataclass
 class DeclContract(_DeclStmt):
     defn: ContractDefn
 
+@dataclass
+class EnumVariantDefn(_Defn):
+    variant: "_EnumVariant"
 
 @dataclass
-class ErrorDefn(_Ast):
-    name: str
-    members: Optional[List["TypeAssign"]]
-    body: Optional[List[Union["_Stmt", "_Expr"]]]
-    
-    def __post_init__(self):
-        if self.members is None:
-            self.members = []
-        if self.body is None:
-            self.body = []
-    
-    def to_struct_defn(self) -> "StructDictDefn":
-        return StructDictDefn(self.name, self.members)
+class _EnumVariant(_Ast):
+    pass
 
+@dataclass
+class EnumVariantStruct(_EnumVariant):
+    name: "Ident"
+    members: list
+
+@dataclass
+class EnumVariantTuple(_EnumVariant):
+    name: "Ident"
+    members: list
+
+@dataclass
+class EnumVariantUnit(_EnumVariant):
+    name: "Ident"
+@dataclass
+class ErrorDefn(_Defn):
+    defn: _EnumVariant
 
 @dataclass
 class DeclError(_DeclStmt, ast_utils.AsList):
@@ -152,19 +144,8 @@ class DeclError(_DeclStmt, ast_utils.AsList):
 
 
 @dataclass
-class EventDefn(_Ast):
-    name: str
-    members: Optional[List["TypeAssign"]]
-    body: Optional[List[Union["_Stmt", "_Expr"]]]
-    
-    def __post_init__(self):
-        if self.members is None:
-            self.members = []
-        if self.body is None:
-            self.body = []
-    
-    def to_struct_defn(self) -> "StructDictDefn":
-        return StructDictDefn(self.name, self.members)
+class EventDefn(_Defn):
+    defn: _EnumVariant
 
 @dataclass
 class DeclEvent(_DeclStmt, ast_utils.AsList):
@@ -176,29 +157,28 @@ class DeclExec(_DeclStmt, ast_utils.AsList):
     defns: list
 
 
-class _StateDefn(_Ast):
+class _StateDefn(_Defn):
     pass
 
 
 @dataclass
 class ItemDefn(_StateDefn):
-    key: str
-    type_expr: str
-
+    key: Ident
+    type: "_TypeExpr"
 
 @dataclass
 class MapDefn(_StateDefn):
     prefix: str
-    type_keys: list
-    type_value: str
-
+    keys: str
+    value: str
+    
+FnArgs = List["TypeAssign"]
 
 @dataclass
-class ExecDefn(_Ast):
-    name: str
-    args: list
+class ExecDefn(_Defn):
+    name: Ident
+    args: FnArgs
     body: str
-
 
 @dataclass
 class InfixOpExpr(_Ast):
@@ -251,55 +231,67 @@ class IfElseIfElseExpr(_Ast):
     else_clause: str
 
 
-
 @dataclass
 class DeclQuery(_DeclStmt, ast_utils.AsList):
     defns: List["_QueryDefn"]
-    
-class _QueryDefn(_Ast):
+
+
+@dataclass
+class _QueryDefn(_Defn):
     pass
+
 
 @dataclass
 class QueryDefnFn(_QueryDefn):
-    name: str
-    args: Optional[List["TypeAssign"]]
+    name: Ident
+    args: FnArgs
     response_type: "_TypeExpr"
     body: Optional[List[Union[_Stmt, _Expr]]]
-    
-    def to_enum_variant(self) -> "EnumVariant":
-        if self.args is None:
-            return EnumVariantUnit(self.name.to_pascal(), self.args)
-        else:
-            return EnumVariantDict(snake_to_pascal(self.name), self.args)
 
 @dataclass
 class QueryDefnResponds(_QueryDefn):
-    name: "Ident"
-    args: str
+    name: Ident
+    args: FnArgs
     response_defn: "QueryResponseDefn"
-    
+
     def to_query_defn_fn(self) -> QueryDefnFn:
-        struct_name = f"{self.name.to_pascal()}Response" 
-        struct_members = [tas.type_assign for tas in self.response_defn.body]
-        return QueryDefnFn(name = self.name, args = self.args, response_type = StructDictDefn(struct_name, struct_members), body=None)
+        struct_name = f"{self.name.to_pascal()}Response"
+        struct_members = [tas.type_assign for tas in self.response_defn]
+        return QueryDefnFn(
+            annotations=self.annotations,
+            name=self.name,
+            args=self.args,
+            response_type=StructCDefn(None, struct_name, struct_members),
+            body=None,
+        )
+
 
 @dataclass
 class QueryResponseDefn(_Ast):
     body: List["TypeAssignAndSet"]
 
-class _TypeExpr(_Ast): 
+
+class _TypeExpr(_Ast):
     @property
     def typestr(self) -> str:
         raise NotImplementedError(f"property {self.__class__}.typestr not implemented")
 
-class ToTypeExpr:
-    """Denotes that a node can be represented also as a type expression."""
-    
-    def to_type_expr(self):
-        raise NotImplementedError(f"{self.__class__}.to_type_expr() not implemented")
+@dataclass
+class Option(_TypeExpr):
+    wrapped: _TypeExpr
+   
+    @property 
+    def typestr(self) -> str:
+        return "Option<{self.wrapped.typestr}>"
 
 @dataclass
-class TypeAssign(_Ast):
+class TypePath(_TypeExpr):
+    pass
+
+
+
+@dataclass
+class TypeAssign(_Defn):
     name: str
     type: _TypeExpr
 
@@ -307,18 +299,17 @@ class TypeAssign(_Ast):
 @dataclass
 class Typename(_TypeExpr):
     name: str
-    
+
     @property
     def typestr(self) -> str:
         return self.name
-    
 
 
 @dataclass
 class ParamzdTypeExpr(_TypeExpr):
     base_type: _TypeExpr
     param: _TypeExpr
-    
+
     def __str__(self) -> str:
         return f"{self.base_type.typestr}<{self.param.typestr}>"
 
@@ -330,13 +321,15 @@ class StructDictAssign(_Ast):
 
 
 @dataclass
-class InstantiateDefn(_Ast):
+class InstantiateDefn(_Defn):
     args: list
     body: list
+
 
 @dataclass
 class DeclInstantiate(_DeclStmt):
     defn: "InstantiateDefn"
+
 
 @dataclass
 class TypeAssignAndSet(_Ast):
@@ -357,59 +350,52 @@ class MapKeyDefn(_Ast):
     type: str
 
 
-class EnumVariant(_Ast):
-    pass
-
-
 @dataclass
-class EnumVariantUnit(EnumVariant):
+class EnumDefn(_Defn, _TypeExpr):
     name: str
+    variants: List[_EnumVariant]
 
-
-@dataclass
-class EnumVariantTuple(EnumVariant):
-    name: str
-    members: list
-
-@dataclass
-class EnumDefn(_TypeExpr):
-    name: str
-    variants: List[EnumVariant]
-   
-    @property 
+    @property
     def typestr(self) -> str:
-        return self.name 
+        return self.name
 
-@dataclass
-class EnumVariantDict(EnumVariant):
-    name: str
-    members: List[TypeAssign]
+
 
 @dataclass
 class DeclState(_DeclStmt, ast_utils.AsList):
     defns: list
 
-class _StructDefn(_TypeExpr):
+@dataclass
+class StructDefn(_Defn, _TypeExpr):
+    
     @property
     def typestr(self) -> str:
         return self.name
-
 @dataclass
-class StructDictDefn(_StructDefn):
-    name: str
+class StructCDefn(StructDefn):
+    name: Ident
     members: List[TypeAssign]
-    
-@dataclass
-class StructDictVal(_Ast):
-    name: str
-    members_vals: List[StructDictAssign]
 
+@dataclass
+class StructTupleDefn(StructDefn):
+    name: Ident
+    members: List[_TypeExpr]
+
+@dataclass
+class StructUnitDefn(StructDefn):
+    name: Ident
 
 @dataclass
 class IdentPath(_Ast, ast_utils.AsList):
-    parts: List[str]
+    parts: List[Ident]
+    
+    def __str__(self):
+        return ".".join(str(part) for part in self.parts)
 
-
+@dataclass
+class MapKey(_Ast):
+    key: Ident
+    type: _TypeExpr
 @dataclass
 class EmitStmt(_Stmt):
     expr: _Expr
@@ -423,6 +409,15 @@ class FailStmt(_Stmt):
 class _Value(_Expr):
     pass
 
+@dataclass
+class StructVal(_Value):
+    name: Ident
+    members: list
+
+@dataclass
+class StructValAssign(_Ast):
+    name: Ident
+    value: _Expr
 
 @dataclass
 class String(_Value):
@@ -432,68 +427,48 @@ class String(_Value):
 @dataclass
 class Integer(_Value):
     value: int
-    
-@dataclass
-class Ident(_Ast):
-    symbol: Token 
 
-    def to_pascal(self) -> "Ident":
-        return Ident(snake_to_pascal(str(self.symbol)))
 
-    def to_snake(self) -> "Ident":
-        return Ident(pascal_to_snake(str(self.symbol)))
-    
-    def __str__(self) -> str:
-        return str(self.symbol)
+as_list = lambda _, x: x
+first = lambda _, x: x[0]
+alias_to = lambda t: lambda _, x: t(*x)
 
 ## Transformer
 class CWScriptToAST(Transformer):
-    def contract_stmts(self, stmts):
-        return stmts
 
-    def struct_dict_assigns(self, x):
-        return x
-
-    def struct_tuple_assigns(self, x):
-        return x
-
-    def decl_enum_variants(self, x):
-        return x
-
-    def decl_map_keys(self, x):
-        return x
-
-    def type_assigns(self, x):
-        return x
-    
-    def type_assign_and_sets(self, x):
-        return x
-    
-    def fn_args(self, x):
-        if x[0] is None:
-            return []
-        return x[0]
-
-    def fn_call_args(self, x):
-        return x
-
-    def fn_body(self, x):
-        return x
-
-    def integer(self, x):
-        return Integer(x[0])
-
-    def string(self, x):
-        return String(x[0])
-
-    def infix_op(self, x):
-        return x[0]
-
-    def assign_op(self, x):
-        return str(x[0])
+    error_defn2 = alias_to(ErrorDefn)
+    event_defn2 = alias_to(EventDefn)
+    ## state
+    item_defn2 = alias_to(ItemDefn) 
+    map_defn2 = alias_to(MapDefn)
+    exec_defn2 = alias_to(ExecDefn)
+    query_defn_fn2 = alias_to(QueryDefnFn)
+    query_defn_responds2 = alias_to(QueryDefnResponds)
    
-    def ident_pascal(self, x):
-        return Ident(x[0])
-   
-    def ident_snake(self, x):
-        return Ident(x[0]) 
+    annotations = as_list
+    annotation_items = as_list
+    contract_stmts = as_list
+    errors_group = as_list
+    events_group = as_list 
+    exec_group = as_list 
+    state_group = as_list
+    fn_args = as_list
+    fn_body = as_list
+    fn_call_args = as_list
+    type_assign_and_sets = as_list
+    type_assigns = as_list
+    map_keys = as_list
+    struct_val_assigns = as_list
+    enum_variant_defns = as_list
+    
+    tuple_members = first
+    struct_members = first
+    struct_members_with_assign = first
+    
+    ## values
+    integer = alias_to(Integer)
+    string = alias_to(String)
+    infix_op = first
+    assign_op = first
+    ident_pascal = alias_to(Ident)
+    ident_snake = alias_to(Ident)
