@@ -1,5 +1,0 @@
-pub enum ContractEvent {
-    {% for event in events %}
-    {{ event.generate_code(env) }}
-    {% endfor%}
-}

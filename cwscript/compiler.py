@@ -1,12 +1,12 @@
 import os
-from os import PathLike, mkdir
+from os import PathLike
 from typing import List
 from pathlib import Path
 
 from cwscript.lang.parser import parse_cwscript_src
-from cwscript.lang.model import build_contract_model, ContractModel
-from cwscript.lang.ast_nodes import FileCode, DeclContract, ContractDefn
-from cwscript.util.strings import camel_to_snake
+from cwscript.lang.ast import FileCode, DeclContract, ContractDefn
+from cwscript.model import ContractModel
+from cwscript.util.strings import *
 from cwscript.template import contract_crate_templates as templates, render_to_file
 
 
@@ -40,14 +40,13 @@ class CWScriptCompiler:
         contract_models = []
         for fc in file_codes:
             for stmt in fc.body:
-                print(stmt)
                 if isinstance(stmt, DeclContract):
-                    contract_models.append(build_contract_model(stmt.defn))
+                    contract_models.append(ContractModel.from_ast(stmt.defn))
         
         if len(contract_models) > 1:
             pass
         else:
-            contract_models[0].write_as_crate(self._getpath(target_dir), crate_name=name)
+            pass
 
     def generate_crate(self, contract_model: ContractModel, target_dir: PathLike, crate_name: str = None):
         if crate_name is None:

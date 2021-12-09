@@ -33,16 +33,11 @@ pub enum QueryMsg {
 {% endfor %}
 }
 
-{% for resp in model.query_responses %}
-{% for  in query %}
-    {{ query_fn.name }} {
-        {% for arg in exec_fn.args %}
-            {{arg.name}}: {{arg.type.generate_code(env)}},
-        {% endfor %}
-    },
-{% endfor %}
-{% endfor %}
+{% for response in model.query_responses %}
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
-pub struct CountResponse {
-    pub count: i32,
+pub struct {{ response.name }} {
+{% for member in resp.members %}
+    {{ member.name }}: {{member.type.generate_code(env)}},
+{% endfor %}
 }
+{% endfor %}

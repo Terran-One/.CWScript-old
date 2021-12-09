@@ -1,0 +1,10 @@
+pub enum {{ enum.name }} {
+{% for variant in enum.variants %}
+{{ cg.struct_variant() }}
+{{ variant.name }} {
+{% for arg in enu %}
+{{ arg.name }}: {{ arg.type.typestr }},
+{% endfor %},
+},
+{% endfor %}
+}

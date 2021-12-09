@@ -1,0 +1,86 @@
+{% macro render_errors(errors) %}
+use cosmwasm_std::StdError;
+use thiserror::Error;
+
+#[derive(Error, Debug, PartialEq)]
+pub enum ContractError {
+#[error("{0}")]
+Std(#[from] StdError),
+{%- for err in errors -%}
+{{ err.name }} {
+{%- for member in err.members -%}
+{{ member.name }}: {{ member.type.typestr }},
+{%- endfor -%}
+},
+{%- endfor -%}
+}
+{% endmacro %}
+
+{% macro render_events(events) %}
+pub enum ContractEvent {
+{% for event in contract.events %}
+{{ event.name }} {
+{%- for member in event.members -%}
+{{ member.name }}: {{ member.type.typestr }},
+{%- endfor -%}
+},
+{% endfor %}
+}
+{% endmacro %}
+
+{% macro render_instantiate_msg(inst) %}
+pub struct InstantiateMsg {
+{% for arg in inst.args %}
+{{ arg.name }}: {{arg.type.typestr}},
+{% endfor %}
+}
+{% endmacro %}
+
+{% macro render_execute_msg(execs) %}
+pub enum ExecuteMsg {
+{% for exec in execs %}
+{{ exec.name }} {
+{%- for arg in execs.args -%}
+{{ arg.name }}: {{ arg.type.typestr }},
+{%- endfor -%}
+},
+{% endfor %}
+}
+{% endmacro %}
+
+{% macro render_query_msg(querys) %}
+pub enum QueryMsg {
+{% for query in querys %}
+{{ query.name.to_pascal() }} {
+{%- for arg in query.args -%}
+{{ arg.name }}: {{ arg.type.typestr }},
+{%- endfor -%}
+},
+{% endfor %}
+}
+{% endmacro %}
+
+{% macro render_query_responses(querys) %}
+{% for query in querys %}
+pub struct {{ query.response_type.typestr }} {
+{% for member in query.response_type.members %}
+{{ member.name }}: {{ member.type.typestr }},
+{% endfor %}
+}
+{% endfor %}
+{% endmacro %}
+
+pub mod {{ contract.defn.name.to_snake() }} {
+mod error {
+{{ render_errors(contract.errors) }}
+}
+mod events {
+{{ render_events(contract.events) }}
+}
+mod msgs {
+{{ render_instantiate_msg(contract.instantiate[0]) }}
+{{ render_execute_msg(contract.exec) }}
+{{ render_query_msg(contract.query) }}
+{{ render_query_responses(contract.query) }}
+}
+}

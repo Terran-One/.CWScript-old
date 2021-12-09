@@ -1,0 +1,5 @@
+pub struct InstantiateMsg {
+{% for arg in contract.instantiate[0].args %}
+    {{ arg.name }}: {{arg.type.typestr}},
+{% endfor %}
+}

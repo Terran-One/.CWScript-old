@@ -1,0 +1,9 @@
+pub enum ExecuteMsg {
+{% for exec in contract.exec %}
+    {{ exec.name }} {
+    {% for arg in exec %}
+        {{ arg.name }}: {{ arg.type.typestr }},
+    {% endfor %}
+    },
+{% endfor %}
+}

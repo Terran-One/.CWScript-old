@@ -49,25 +49,25 @@ decl_query:
     | "query" query_defn
     | "query" "{" query_defn+ "}"
 query_defn: ident fn_args "->" type_expr [fn_body] -> query_defn_fn
-    | ident fn_args "responds" response_defn -> query_defn_responds
+    | ident fn_args "responds" query_response_defn -> query_defn_responds
 
-?response_defn: "{" [decl_response_members ","?] "}"
-?decl_response_members: type_assign_and_set ("," type_assign_and_set)*
-
-?decl_struct: "struct" struct_dict_defn
-    | "struct" struct_tuple_defn
-    | "struct" struct_unit_defn
+query_response_defn: "{" [type_assign_and_sets ","?] "}"
+?decl_struct: "struct" struct_defn
+?struct_defn: struct_dict_defn
+    | struct_tuple_defn
+    | struct_unit_defn
 
 struct_dict_defn: ident_pascal "{" [type_assigns ","?] "}"
 struct_tuple_defn: ident_pascal "(" [type_assigns] ")"
 struct_unit_defn: ident_pascal
 
-?decl_and_set_struct_members: type_assign_and_set ("," type_assign_and_set)*
 type_assigns: type_assign ("," type_assign)*
 type_assign: ident ":" type_expr
+type_assign_and_sets: type_assign_and_set ("," type_assign_and_set)*
 type_assign_and_set: type_assign "=" expr
 
-?decl_enum: "enum" ident_pascal "{" [decl_enum_variants] "}"
+?decl_enum: "enum" enum_defn
+enum_defn: ident_pascal "{" [decl_enum_variants] "}"
 ?decl_enum_variants: decl_enum_variant ("," decl_enum_variant)* ","?
 ?decl_enum_variant: ident_pascal "{" [type_assigns ","] "}" -> enum_variant_dict
     | ident_pascal "(" [type_assigns] ")" -> enum_variant_tuple
@@ -75,7 +75,7 @@ type_assign_and_set: type_assign "=" expr
 
 // FUNCTION SYNTAX
 
-?fn_args: "(" [type_assigns] ")"
+fn_args: "(" [type_assigns] ")"
 ?decl_fn_arg: ident ":" type_expr
 fn_body: "{" (stmt | expr)* "}"
 
@@ -148,9 +148,9 @@ struct_tuple_assign: [ident ":"] expr
 
 // IDENTITIES & SYMBOLS
 
-?ident: /[a-zA-Z_$][a-zA-Z0-9_]*/ // for variable names
-?ident_pascal: /[A-Z][a-zA-Z0-9]*/ // start with capital
-?ident_snake: /[a-z][a-z0-9_]*/ // start with lowercase
+ident: /[a-zA-Z_$][a-zA-Z0-9_]*/ // for variable names
+ident_pascal: /[A-Z][a-zA-Z0-9]*/ // start with capital
+ident_snake: /[a-z][a-z0-9_]*/ // start with lowercase
 
 string : ESCAPED_STRING
 integer: /[+\-]/? /[1-9][0-9]*/

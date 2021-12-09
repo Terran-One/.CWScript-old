@@ -1,0 +1,9 @@
+pub enum ContractEvent {
+    {% for event in contract.events %}
+    {{ event.name }} {
+        {%- for member in event.members -%}
+        {{ member.name }}: {{ member.type.typestr }},
+        {%- endfor -%}
+    },
+    {% endfor %}
+}

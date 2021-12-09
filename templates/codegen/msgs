@@ -1,0 +1,6 @@
+pub mod msgs {
+{{ contract.gen_instantiate_msg_struct() }} 
+{{ contract.gen_execute_msg_enum() }}
+{{ contract.gen_query_msg_enum() }}
+{{ contract.gen_query_responses_structs() }}
+}

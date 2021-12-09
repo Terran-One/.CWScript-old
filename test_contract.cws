@@ -21,11 +21,11 @@ contract CW20 {
 			}
 		},
 		Unauthorized, // both args () and body {} can be omitted if not needed
-			InsufficientFunds(balance: Uint128, needed: Uint128) {
-				// use string interpolation
-				"you only had {balance}, which is less than the {needed} required"
-			}
+		InsufficientFunds(balance: Uint128, needed: Uint128) {
+			// use string interpolation
+			"you only had {balance}, which is less than the {needed} required"
 		}
+	}
 
 	// declare a single event type
 	event Action(method: String, owner: String, count: String)
@@ -93,7 +93,9 @@ contract CW20 {
 
 	// however, we can use another pattern...
 	query user_balance_for_token(user: Addr, token: Addr) responds {
-		balance: Uint128 = $state.token_balances[user][token][1]
+		user: Addr = user,
+		token: Addr = token,
+		balance: Uint128 = $state.token_balances[user][token][1],
 	}
 
 	// this is equivalent to:

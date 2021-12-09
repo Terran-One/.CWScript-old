@@ -1,5 +1,0 @@
-{{struct.name}} {
-    {% for member in struct.members %}
-    {{ member.name}}: {{ member.type.generate_code(env) }},
-    {% endfor %}
-}

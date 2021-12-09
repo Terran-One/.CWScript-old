@@ -2,21 +2,27 @@ FileCode(
     body=[
         DeclContract(
             defn=ContractDefn(
-                name=Token("__ANON_16", "CW20"),
+                name=Ident(symbol=Token("__ANON_16", "CW20")),
                 body=[
                     DeclError(
                         defns=[
                             ErrorDefn(
-                                name=Token("__ANON_16", "ImproperFormat"),
+                                name=Ident(symbol=Token("__ANON_16", "ImproperFormat")),
                                 members=[
                                     TypeAssign(
-                                        name=Token("__ANON_15", "user"),
-                                        type=Typename(name=Token("__ANON_15", "Addr")),
+                                        name=Ident(symbol=Token("__ANON_15", "user")),
+                                        type=Typename(
+                                            name=Ident(
+                                                symbol=Token("__ANON_15", "Addr")
+                                            )
+                                        ),
                                     ),
                                     TypeAssign(
-                                        name=Token("__ANON_15", "input"),
+                                        name=Ident(symbol=Token("__ANON_15", "input")),
                                         type=Typename(
-                                            name=Token("__ANON_15", "String")
+                                            name=Ident(
+                                                symbol=Token("__ANON_15", "String")
+                                            )
                                         ),
                                     ),
                                 ],
@@ -24,9 +30,13 @@ FileCode(
                                     IfExpr(
                                         if_clause=IfClause(
                                             predicate=InfixOpExpr(
-                                                lhs=Token("__ANON_15", "input"),
+                                                lhs=Ident(
+                                                    symbol=Token("__ANON_15", "input")
+                                                ),
                                                 op=Token("__ANON_11", "!="),
-                                                rhs=Token("__ANON_15", "None"),
+                                                rhs=Ident(
+                                                    symbol=Token("__ANON_15", "None")
+                                                ),
                                             ),
                                             body=[
                                                 String(
@@ -54,18 +64,30 @@ FileCode(
                     DeclError(
                         defns=[
                             ErrorDefn(
-                                name=Token("__ANON_16", "NotEnabled"),
+                                name=Ident(symbol=Token("__ANON_16", "NotEnabled")),
                                 members=[
                                     TypeAssign(
-                                        name=Token("__ANON_15", "req_level"),
-                                        type=DeclEnum(
-                                            name=Token("__ANON_16", "Levels"),
+                                        name=Ident(
+                                            symbol=Token("__ANON_15", "req_level")
+                                        ),
+                                        type=EnumDefn(
+                                            name=Ident(
+                                                symbol=Token("__ANON_16", "Levels")
+                                            ),
                                             variants=[
                                                 EnumVariantUnit(
-                                                    name=Token("__ANON_16", "Admin")
+                                                    name=Ident(
+                                                        symbol=Token(
+                                                            "__ANON_16", "Admin"
+                                                        )
+                                                    )
                                                 ),
                                                 EnumVariantUnit(
-                                                    name=Token("__ANON_16", "Student")
+                                                    name=Ident(
+                                                        symbol=Token(
+                                                            "__ANON_16", "Student"
+                                                        )
+                                                    )
                                                 ),
                                             ],
                                         ),
@@ -75,13 +97,25 @@ FileCode(
                                     IfExpr(
                                         if_clause=IfClause(
                                             predicate=InfixOpExpr(
-                                                lhs=InfixOpExpr(
-                                                    lhs=Token("__ANON_15", "req_level"),
-                                                    op=Token("__ANON_10", "=="),
-                                                    rhs=Token("__ANON_15", "Levels"),
+                                                lhs=Ident(
+                                                    symbol=Token(
+                                                        "__ANON_15", "req_level"
+                                                    )
                                                 ),
-                                                op=Token("__ANON_14", "::"),
-                                                rhs=Token("__ANON_15", "Admin"),
+                                                op=Token("__ANON_10", "=="),
+                                                rhs=InfixOpExpr(
+                                                    lhs=Ident(
+                                                        symbol=Token(
+                                                            "__ANON_15", "Levels"
+                                                        )
+                                                    ),
+                                                    op=Token("__ANON_14", "::"),
+                                                    rhs=Ident(
+                                                        symbol=Token(
+                                                            "__ANON_15", "Admin"
+                                                        )
+                                                    ),
+                                                ),
                                             ),
                                             body=[
                                                 String(
@@ -105,23 +139,31 @@ FileCode(
                                 ],
                             ),
                             ErrorDefn(
-                                name=Token("__ANON_16", "Unauthorized"),
-                                members=None,
-                                body=None,
+                                name=Ident(symbol=Token("__ANON_16", "Unauthorized")),
+                                members=[],
+                                body=[],
                             ),
                             ErrorDefn(
-                                name=Token("__ANON_16", "InsufficientFunds"),
+                                name=Ident(
+                                    symbol=Token("__ANON_16", "InsufficientFunds")
+                                ),
                                 members=[
                                     TypeAssign(
-                                        name=Token("__ANON_15", "balance"),
+                                        name=Ident(
+                                            symbol=Token("__ANON_15", "balance")
+                                        ),
                                         type=Typename(
-                                            name=Token("__ANON_15", "Uint128")
+                                            name=Ident(
+                                                symbol=Token("__ANON_15", "Uint128")
+                                            )
                                         ),
                                     ),
                                     TypeAssign(
-                                        name=Token("__ANON_15", "needed"),
+                                        name=Ident(symbol=Token("__ANON_15", "needed")),
                                         type=Typename(
-                                            name=Token("__ANON_15", "Uint128")
+                                            name=Ident(
+                                                symbol=Token("__ANON_15", "Uint128")
+                                            )
                                         ),
                                     ),
                                 ],
@@ -139,119 +181,161 @@ FileCode(
                     DeclEvent(
                         defns=[
                             EventDefn(
-                                name=Token("__ANON_16", "Action"),
+                                name=Ident(symbol=Token("__ANON_16", "Action")),
                                 members=[
                                     TypeAssign(
-                                        name=Token("__ANON_15", "method"),
+                                        name=Ident(symbol=Token("__ANON_15", "method")),
                                         type=Typename(
-                                            name=Token("__ANON_15", "String")
+                                            name=Ident(
+                                                symbol=Token("__ANON_15", "String")
+                                            )
                                         ),
                                     ),
                                     TypeAssign(
-                                        name=Token("__ANON_15", "owner"),
+                                        name=Ident(symbol=Token("__ANON_15", "owner")),
                                         type=Typename(
-                                            name=Token("__ANON_15", "String")
+                                            name=Ident(
+                                                symbol=Token("__ANON_15", "String")
+                                            )
                                         ),
                                     ),
                                     TypeAssign(
-                                        name=Token("__ANON_15", "count"),
+                                        name=Ident(symbol=Token("__ANON_15", "count")),
                                         type=Typename(
-                                            name=Token("__ANON_15", "String")
+                                            name=Ident(
+                                                symbol=Token("__ANON_15", "String")
+                                            )
                                         ),
                                     ),
                                 ],
-                                body=None,
+                                body=[],
                             )
                         ]
                     ),
                     DeclEvent(
                         defns=[
                             EventDefn(
-                                name=Token("__ANON_16", "Increment"),
-                                members=None,
-                                body=None,
+                                name=Ident(symbol=Token("__ANON_16", "Increment")),
+                                members=[],
+                                body=[],
                             ),
                             EventDefn(
-                                name=Token("__ANON_16", "Reset"),
+                                name=Ident(symbol=Token("__ANON_16", "Reset")),
                                 members=[
                                     TypeAssign(
-                                        name=Token("__ANON_15", "method"),
+                                        name=Ident(symbol=Token("__ANON_15", "method")),
                                         type=Typename(
-                                            name=Token("__ANON_15", "String")
+                                            name=Ident(
+                                                symbol=Token("__ANON_15", "String")
+                                            )
                                         ),
                                     )
                                 ],
-                                body=None,
+                                body=[],
                             ),
                         ]
                     ),
                     DeclState(
                         defns=[
                             ItemDefn(
-                                key=Token("__ANON_15", "curr_num"),
-                                type_expr=Typename(name=Token("__ANON_15", "i32")),
+                                key=Ident(symbol=Token("__ANON_15", "curr_num")),
+                                type_expr=Typename(
+                                    name=Ident(symbol=Token("__ANON_15", "i32"))
+                                ),
                             )
                         ]
                     ),
                     DeclState(
                         defns=[
                             MapDefn(
-                                prefix=Token("__ANON_15", "balances"),
+                                prefix=Ident(symbol=Token("__ANON_15", "balances")),
                                 type_keys=[
                                     MapKeyDefn(
                                         key=None,
-                                        type=Typename(name=Token("__ANON_15", "Addr")),
+                                        type=Typename(
+                                            name=Ident(
+                                                symbol=Token("__ANON_15", "Addr")
+                                            )
+                                        ),
                                     )
                                 ],
-                                type_value=Typename(name=Token("__ANON_15", "Uint128")),
+                                type_value=Typename(
+                                    name=Ident(symbol=Token("__ANON_15", "Uint128"))
+                                ),
                             )
                         ]
                     ),
                     DeclState(
                         defns=[
                             ItemDefn(
-                                key=Token("__ANON_15", "config"),
+                                key=Ident(symbol=Token("__ANON_15", "config")),
                                 type_expr=StructDictDefn(
-                                    name=Token("__ANON_16", "ConfigData"),
+                                    name=Ident(symbol=Token("__ANON_16", "ConfigData")),
                                     members=[
                                         TypeAssign(
-                                            name=Token("__ANON_15", "owner"),
+                                            name=Ident(
+                                                symbol=Token("__ANON_15", "owner")
+                                            ),
                                             type=Typename(
-                                                name=Token("__ANON_15", "Addr")
+                                                name=Ident(
+                                                    symbol=Token("__ANON_15", "Addr")
+                                                )
                                             ),
                                         ),
                                         TypeAssign(
-                                            name=Token("__ANON_15", "count"),
+                                            name=Ident(
+                                                symbol=Token("__ANON_15", "count")
+                                            ),
                                             type=Typename(
-                                                name=Token("__ANON_15", "i32")
+                                                name=Ident(
+                                                    symbol=Token("__ANON_15", "i32")
+                                                )
                                             ),
                                         ),
                                         TypeAssign(
-                                            name=Token("__ANON_15", "fee_percent"),
+                                            name=Ident(
+                                                symbol=Token("__ANON_15", "fee_percent")
+                                            ),
                                             type=Typename(
-                                                name=Token("__ANON_15", "Decimal")
+                                                name=Ident(
+                                                    symbol=Token("__ANON_15", "Decimal")
+                                                )
                                             ),
                                         ),
                                     ],
                                 ),
                             ),
                             MapDefn(
-                                prefix=Token("__ANON_15", "token_balances"),
+                                prefix=Ident(
+                                    symbol=Token("__ANON_15", "token_balances")
+                                ),
                                 type_keys=[
                                     MapKeyDefn(
-                                        key=Token("__ANON_15", "user"),
-                                        type=Typename(name=Token("__ANON_15", "Addr")),
+                                        key=Ident(symbol=Token("__ANON_15", "user")),
+                                        type=Typename(
+                                            name=Ident(
+                                                symbol=Token("__ANON_15", "Addr")
+                                            )
+                                        ),
                                     ),
                                     MapKeyDefn(
                                         key=None,
-                                        type=Typename(name=Token("__ANON_15", "Addr")),
+                                        type=Typename(
+                                            name=Ident(
+                                                symbol=Token("__ANON_15", "Addr")
+                                            )
+                                        ),
                                     ),
                                     MapKeyDefn(
-                                        key=Token("__ANON_15", "bucket"),
-                                        type=Typename(name=Token("__ANON_15", "u32")),
+                                        key=Ident(symbol=Token("__ANON_15", "bucket")),
+                                        type=Typename(
+                                            name=Ident(symbol=Token("__ANON_15", "u32"))
+                                        ),
                                     ),
                                 ],
-                                type_value=Typename(name=Token("__ANON_15", "Uint128")),
+                                type_value=Typename(
+                                    name=Ident(symbol=Token("__ANON_15", "Uint128"))
+                                ),
                             ),
                         ]
                     ),
@@ -259,47 +343,79 @@ FileCode(
                         defn=InstantiateDefn(
                             args=[
                                 TypeAssign(
-                                    name=Token("__ANON_15", "count"),
-                                    type=Typename(name=Token("__ANON_15", "i32")),
+                                    name=Ident(symbol=Token("__ANON_15", "count")),
+                                    type=Typename(
+                                        name=Ident(symbol=Token("__ANON_15", "i32"))
+                                    ),
                                 ),
                                 TypeAssign(
-                                    name=Token("__ANON_15", "fee_percent"),
-                                    type=Typename(name=Token("__ANON_15", "Dec")),
+                                    name=Ident(
+                                        symbol=Token("__ANON_15", "fee_percent")
+                                    ),
+                                    type=Typename(
+                                        name=Ident(symbol=Token("__ANON_15", "Dec"))
+                                    ),
                                 ),
                             ],
                             body=[
                                 AssignStmt(
                                     lhs=IdentPath(
                                         parts=[
-                                            Token("__ANON_15", "$state"),
-                                            Token("__ANON_15", "config"),
+                                            Ident(symbol=Token("__ANON_15", "$state")),
+                                            Ident(symbol=Token("__ANON_15", "config")),
                                         ]
                                     ),
                                     assign_op="=",
                                     rhs=StructDictVal(
-                                        name=Token("__ANON_16", "ConfigData"),
+                                        name=Ident(
+                                            symbol=Token("__ANON_16", "ConfigData")
+                                        ),
                                         members_vals=[
                                             StructDictAssign(
-                                                name=Token("__ANON_15", "owner"),
+                                                name=Ident(
+                                                    symbol=Token("__ANON_15", "owner")
+                                                ),
                                                 value=MemberAccessExpr(
-                                                    item=Token("__ANON_15", "$env"),
-                                                    member=Token("__ANON_15", "sender"),
+                                                    item=Ident(
+                                                        symbol=Token(
+                                                            "__ANON_15", "$env"
+                                                        )
+                                                    ),
+                                                    member=Ident(
+                                                        symbol=Token(
+                                                            "__ANON_15", "sender"
+                                                        )
+                                                    ),
                                                 ),
                                             ),
                                             StructDictAssign(
-                                                name=Token("__ANON_15", "count"),
-                                                value=Token("__ANON_15", "count"),
+                                                name=Ident(
+                                                    symbol=Token("__ANON_15", "count")
+                                                ),
+                                                value=Ident(
+                                                    symbol=Token("__ANON_15", "count")
+                                                ),
                                             ),
                                             StructDictAssign(
-                                                name=Token("__ANON_15", "fee_percent"),
-                                                value=Token("__ANON_15", "fee_percent"),
+                                                name=Ident(
+                                                    symbol=Token(
+                                                        "__ANON_15", "fee_percent"
+                                                    )
+                                                ),
+                                                value=Ident(
+                                                    symbol=Token(
+                                                        "__ANON_15", "fee_percent"
+                                                    )
+                                                ),
                                             ),
                                         ],
                                     ),
                                 ),
                                 EmitStmt(
                                     expr=FnCallExpr(
-                                        fn_name=Token("__ANON_15", "Action"),
+                                        fn_name=Ident(
+                                            symbol=Token("__ANON_15", "Action")
+                                        ),
                                         args=[
                                             String(
                                                 value=Token(
@@ -307,10 +423,14 @@ FileCode(
                                                 )
                                             ),
                                             MemberAccessExpr(
-                                                item=Token("__ANON_15", "$env"),
-                                                member=Token("__ANON_15", "sender"),
+                                                item=Ident(
+                                                    symbol=Token("__ANON_15", "$env")
+                                                ),
+                                                member=Ident(
+                                                    symbol=Token("__ANON_15", "sender")
+                                                ),
                                             ),
-                                            Token("__ANON_15", "count"),
+                                            Ident(symbol=Token("__ANON_15", "count")),
                                         ],
                                     )
                                 ),
@@ -320,20 +440,28 @@ FileCode(
                     DeclExec(
                         defns=[
                             ExecDefn(
-                                name=Token("__ANON_15", "msg_name_snake_case"),
+                                name=Ident(
+                                    symbol=Token("__ANON_15", "msg_name_snake_case")
+                                ),
                                 args=[
                                     TypeAssign(
-                                        name=Token("__ANON_15", "arg1"),
-                                        type=Typename(name=Token("__ANON_15", "u32")),
+                                        name=Ident(symbol=Token("__ANON_15", "arg1")),
+                                        type=Typename(
+                                            name=Ident(symbol=Token("__ANON_15", "u32"))
+                                        ),
                                     ),
                                     TypeAssign(
-                                        name=Token("__ANON_15", "arg2"),
+                                        name=Ident(symbol=Token("__ANON_15", "arg2")),
                                         type=ParamzdTypeExpr(
                                             base_type=Typename(
-                                                name=Token("__ANON_15", "Option")
+                                                name=Ident(
+                                                    symbol=Token("__ANON_15", "Option")
+                                                )
                                             ),
                                             param=Typename(
-                                                name=Token("__ANON_15", "String")
+                                                name=Ident(
+                                                    symbol=Token("__ANON_15", "String")
+                                                )
                                             ),
                                         ),
                                     ),
@@ -345,15 +473,21 @@ FileCode(
                     DeclExec(
                         defns=[
                             ExecDefn(
-                                name=Token("__ANON_15", "increment"),
-                                args=None,
+                                name=Ident(symbol=Token("__ANON_15", "increment")),
+                                args=[],
                                 body=[
                                     AssignStmt(
                                         lhs=IdentPath(
                                             parts=[
-                                                Token("__ANON_15", "$state"),
-                                                Token("__ANON_15", "config"),
-                                                Token("__ANON_15", "count"),
+                                                Ident(
+                                                    symbol=Token("__ANON_15", "$state")
+                                                ),
+                                                Ident(
+                                                    symbol=Token("__ANON_15", "config")
+                                                ),
+                                                Ident(
+                                                    symbol=Token("__ANON_15", "count")
+                                                ),
                                             ]
                                         ),
                                         assign_op="+=",
@@ -362,11 +496,13 @@ FileCode(
                                 ],
                             ),
                             ExecDefn(
-                                name=Token("__ANON_15", "reset"),
+                                name=Ident(symbol=Token("__ANON_15", "reset")),
                                 args=[
                                     TypeAssign(
-                                        name=Token("__ANON_15", "count"),
-                                        type=Typename(name=Token("__ANON_15", "i32")),
+                                        name=Ident(symbol=Token("__ANON_15", "count")),
+                                        type=Typename(
+                                            name=Ident(symbol=Token("__ANON_15", "i32"))
+                                        ),
                                     )
                                 ],
                                 body=[
@@ -376,26 +512,41 @@ FileCode(
                                                 item=MemberAccessExpr(
                                                     item=InfixOpExpr(
                                                         lhs=MemberAccessExpr(
-                                                            item=Token(
-                                                                "__ANON_15", "$env"
+                                                            item=Ident(
+                                                                symbol=Token(
+                                                                    "__ANON_15", "$env"
+                                                                )
                                                             ),
-                                                            member=Token(
-                                                                "__ANON_15", "sender"
+                                                            member=Ident(
+                                                                symbol=Token(
+                                                                    "__ANON_15",
+                                                                    "sender",
+                                                                )
                                                             ),
                                                         ),
                                                         op=Token("__ANON_11", "!="),
-                                                        rhs=Token(
-                                                            "__ANON_15", "$state"
+                                                        rhs=Ident(
+                                                            symbol=Token(
+                                                                "__ANON_15", "$state"
+                                                            )
                                                         ),
                                                     ),
-                                                    member=Token("__ANON_15", "config"),
+                                                    member=Ident(
+                                                        symbol=Token(
+                                                            "__ANON_15", "config"
+                                                        )
+                                                    ),
                                                 ),
-                                                member=Token("__ANON_15", "owner"),
+                                                member=Ident(
+                                                    symbol=Token("__ANON_15", "owner")
+                                                ),
                                             ),
                                             body=[
                                                 FailStmt(
-                                                    expr=Token(
-                                                        "__ANON_15", "Unauthorized"
+                                                    expr=Ident(
+                                                        symbol=Token(
+                                                            "__ANON_15", "Unauthorized"
+                                                        )
                                                     )
                                                 )
                                             ],
@@ -406,13 +557,19 @@ FileCode(
                                     AssignStmt(
                                         lhs=IdentPath(
                                             parts=[
-                                                Token("__ANON_15", "$state"),
-                                                Token("__ANON_15", "config"),
-                                                Token("__ANON_15", "count"),
+                                                Ident(
+                                                    symbol=Token("__ANON_15", "$state")
+                                                ),
+                                                Ident(
+                                                    symbol=Token("__ANON_15", "config")
+                                                ),
+                                                Ident(
+                                                    symbol=Token("__ANON_15", "count")
+                                                ),
                                             ]
                                         ),
                                         assign_op="=",
-                                        rhs=Token("__ANON_15", "count"),
+                                        rhs=Ident(symbol=Token("__ANON_15", "count")),
                                     ),
                                 ],
                             ),
@@ -421,30 +578,50 @@ FileCode(
                     DeclQuery(
                         defns=[
                             QueryDefnFn(
-                                name=Token("__ANON_15", "count"),
-                                args=None,
+                                name=Ident(symbol=Token("__ANON_15", "count")),
+                                args=[],
                                 response_type=StructDictDefn(
-                                    name=Token("__ANON_16", "CountResponse"),
+                                    name=Ident(
+                                        symbol=Token("__ANON_16", "CountResponse")
+                                    ),
                                     members=[
                                         TypeAssign(
-                                            name=Token("__ANON_15", "count"),
+                                            name=Ident(
+                                                symbol=Token("__ANON_15", "count")
+                                            ),
                                             type=Typename(
-                                                name=Token("__ANON_15", "i32")
+                                                name=Ident(
+                                                    symbol=Token("__ANON_15", "i32")
+                                                )
                                             ),
                                         )
                                     ],
                                 ),
                                 body=[
                                     StructDictVal(
-                                        name=Token("__ANON_16", "CountResponse"),
+                                        name=Ident(
+                                            symbol=Token("__ANON_16", "CountResponse")
+                                        ),
                                         members_vals=StructDictAssign(
-                                            name=Token("__ANON_15", "count"),
+                                            name=Ident(
+                                                symbol=Token("__ANON_15", "count")
+                                            ),
                                             value=MemberAccessExpr(
                                                 item=MemberAccessExpr(
-                                                    item=Token("__ANON_15", "$state"),
-                                                    member=Token("__ANON_15", "config"),
+                                                    item=Ident(
+                                                        symbol=Token(
+                                                            "__ANON_15", "$state"
+                                                        )
+                                                    ),
+                                                    member=Ident(
+                                                        symbol=Token(
+                                                            "__ANON_15", "config"
+                                                        )
+                                                    ),
                                                 ),
-                                                member=Token("__ANON_15", "count"),
+                                                member=Ident(
+                                                    symbol=Token("__ANON_15", "count")
+                                                ),
                                             ),
                                         ),
                                     )
@@ -455,39 +632,111 @@ FileCode(
                     DeclQuery(
                         defns=[
                             QueryDefnResponds(
-                                name=Token("__ANON_15", "user_balance_for_token"),
+                                name=Ident(
+                                    symbol=Token("__ANON_15", "user_balance_for_token")
+                                ),
                                 args=[
                                     TypeAssign(
-                                        name=Token("__ANON_15", "user"),
-                                        type=Typename(name=Token("__ANON_15", "Addr")),
+                                        name=Ident(symbol=Token("__ANON_15", "user")),
+                                        type=Typename(
+                                            name=Ident(
+                                                symbol=Token("__ANON_15", "Addr")
+                                            )
+                                        ),
                                     ),
                                     TypeAssign(
-                                        name=Token("__ANON_15", "token"),
-                                        type=Typename(name=Token("__ANON_15", "Addr")),
+                                        name=Ident(symbol=Token("__ANON_15", "token")),
+                                        type=Typename(
+                                            name=Ident(
+                                                symbol=Token("__ANON_15", "Addr")
+                                            )
+                                        ),
                                     ),
                                 ],
-                                response_defn=TypeAssignAndSet(
-                                    type_assign=TypeAssign(
-                                        name=Token("__ANON_15", "balance"),
-                                        type=Typename(
-                                            name=Token("__ANON_15", "Uint128")
+                                response_defn=QueryResponseDefn(
+                                    body=[
+                                        TypeAssignAndSet(
+                                            type_assign=TypeAssign(
+                                                name=Ident(
+                                                    symbol=Token("__ANON_15", "user")
+                                                ),
+                                                type=Typename(
+                                                    name=Ident(
+                                                        symbol=Token(
+                                                            "__ANON_15", "Addr"
+                                                        )
+                                                    )
+                                                ),
+                                            ),
+                                            value=Ident(
+                                                symbol=Token("__ANON_15", "user")
+                                            ),
                                         ),
-                                    ),
-                                    value=TableLookupExpr(
-                                        item=TableLookupExpr(
-                                            item=TableLookupExpr(
-                                                item=MemberAccessExpr(
-                                                    item=Token("__ANON_15", "$state"),
-                                                    member=Token(
-                                                        "__ANON_15", "token_balances"
+                                        TypeAssignAndSet(
+                                            type_assign=TypeAssign(
+                                                name=Ident(
+                                                    symbol=Token("__ANON_15", "token")
+                                                ),
+                                                type=Typename(
+                                                    name=Ident(
+                                                        symbol=Token(
+                                                            "__ANON_15", "Addr"
+                                                        )
+                                                    )
+                                                ),
+                                            ),
+                                            value=Ident(
+                                                symbol=Token("__ANON_15", "token")
+                                            ),
+                                        ),
+                                        TypeAssignAndSet(
+                                            type_assign=TypeAssign(
+                                                name=Ident(
+                                                    symbol=Token("__ANON_15", "balance")
+                                                ),
+                                                type=Typename(
+                                                    name=Ident(
+                                                        symbol=Token(
+                                                            "__ANON_15", "Uint128"
+                                                        )
+                                                    )
+                                                ),
+                                            ),
+                                            value=TableLookupExpr(
+                                                item=TableLookupExpr(
+                                                    item=TableLookupExpr(
+                                                        item=MemberAccessExpr(
+                                                            item=Ident(
+                                                                symbol=Token(
+                                                                    "__ANON_15",
+                                                                    "$state",
+                                                                )
+                                                            ),
+                                                            member=Ident(
+                                                                symbol=Token(
+                                                                    "__ANON_15",
+                                                                    "token_balances",
+                                                                )
+                                                            ),
+                                                        ),
+                                                        key=Ident(
+                                                            symbol=Token(
+                                                                "__ANON_15", "user"
+                                                            )
+                                                        ),
+                                                    ),
+                                                    key=Ident(
+                                                        symbol=Token(
+                                                            "__ANON_15", "token"
+                                                        )
                                                     ),
                                                 ),
-                                                key=Token("__ANON_15", "user"),
+                                                key=Integer(
+                                                    value=Token("__ANON_19", "1")
+                                                ),
                                             ),
-                                            key=Token("__ANON_15", "token"),
                                         ),
-                                        key=Integer(value=Token("__ANON_19", "1")),
-                                    ),
+                                    ]
                                 ),
                             )
                         ]
@@ -495,52 +744,86 @@ FileCode(
                     DeclQuery(
                         defns=[
                             QueryDefnFn(
-                                name=Token("__ANON_15", "user_balance_for_token"),
+                                name=Ident(
+                                    symbol=Token("__ANON_15", "user_balance_for_token")
+                                ),
                                 args=[
                                     TypeAssign(
-                                        name=Token("__ANON_15", "user"),
-                                        type=Typename(name=Token("__ANON_15", "Addr")),
+                                        name=Ident(symbol=Token("__ANON_15", "user")),
+                                        type=Typename(
+                                            name=Ident(
+                                                symbol=Token("__ANON_15", "Addr")
+                                            )
+                                        ),
                                     ),
                                     TypeAssign(
-                                        name=Token("__ANON_15", "token"),
-                                        type=Typename(name=Token("__ANON_15", "Addr")),
+                                        name=Ident(symbol=Token("__ANON_15", "token")),
+                                        type=Typename(
+                                            name=Ident(
+                                                symbol=Token("__ANON_15", "Addr")
+                                            )
+                                        ),
                                     ),
                                 ],
                                 response_type=StructDictDefn(
-                                    name=Token(
-                                        "__ANON_16", "UserBalanceForTokenResponse"
+                                    name=Ident(
+                                        symbol=Token(
+                                            "__ANON_16", "UserBalanceForTokenResponse"
+                                        )
                                     ),
                                     members=[
                                         TypeAssign(
-                                            name=Token("__ANON_15", "balance"),
+                                            name=Ident(
+                                                symbol=Token("__ANON_15", "balance")
+                                            ),
                                             type=Typename(
-                                                name=Token("__ANON_15", "Uint128")
+                                                name=Ident(
+                                                    symbol=Token("__ANON_15", "Uint128")
+                                                )
                                             ),
                                         )
                                     ],
                                 ),
                                 body=[
                                     StructDictVal(
-                                        name=Token(
-                                            "__ANON_16", "UserBalanceForTokenResponse"
+                                        name=Ident(
+                                            symbol=Token(
+                                                "__ANON_16",
+                                                "UserBalanceForTokenResponse",
+                                            )
                                         ),
                                         members_vals=StructDictAssign(
-                                            name=Token("__ANON_15", "balance"),
+                                            name=Ident(
+                                                symbol=Token("__ANON_15", "balance")
+                                            ),
                                             value=TableLookupExpr(
                                                 item=TableLookupExpr(
                                                     item=TableLookupExpr(
                                                         item=MemberAccessExpr(
-                                                            item=Token(
-                                                                "__ANON_15", "$state"
+                                                            item=Ident(
+                                                                symbol=Token(
+                                                                    "__ANON_15",
+                                                                    "$state",
+                                                                )
                                                             ),
-                                                            member=Token(
-                                                                "__ANON_15",
-                                                                "token_balances",
+                                                            member=Ident(
+                                                                symbol=Token(
+                                                                    "__ANON_15",
+                                                                    "token_balances",
+                                                                )
                                                             ),
                                                         ),
-                                                        key=Token("__ANON_15", "user"),
+                                                        key=Ident(
+                                                            symbol=Token(
+                                                                "__ANON_15", "user"
+                                                            )
+                                                        ),
                                                     ),
-                                                    key=Token("__ANON_15", "token"),
+                                                    key=Ident(
+                                                        symbol=Token(
+                                                            "__ANON_15", "token"
+                                                        )
+                                                    ),
                                                 ),
                                                 key=Integer(
                                                     value=Token("__ANON_19", "1")

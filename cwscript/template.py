@@ -8,7 +8,6 @@ from collections import defaultdict
 this_dir = Path(os.path.dirname(__file__))
 parent_dir = this_dir.parent.absolute()
 templates_dir = os.path.join(parent_dir, "templates")
-print(parent_dir)
 j_env = Environment(loader=FileSystemLoader(templates_dir))
 templates = defaultdict(dict)
 
