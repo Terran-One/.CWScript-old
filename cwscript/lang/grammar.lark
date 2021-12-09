@@ -77,20 +77,19 @@ struct_unit_defn: [annotations] "struct" ident_pascal
 
 // ANNOTATIONS
 
+simple_path: ident ("::" ident)*
 annotations: annotation+
 annotation: "#[" annotation_items "]"
 annotation_items: annotation_item ("," annotation_item)*
 ?annotation_item: simple_path | fn_call_expr
 
 // BUILDING BLOCKS
-type_exprs: type_expr ("," type_expr)*
-type_assigns: type_assign ("," type_assign)*
 type_assign: [annotations] ident ":" type_expr
-type_assign_and_sets: type_assign_and_set ("," type_assign_and_set)*
 type_assign_and_set: type_assign "=" expr
-struct_members: "(" [type_assigns] ")" | "{" [type_assigns ","?] "}"
-tuple_members: "(" [type_exprs] ")"
-struct_members_with_assign: "(" [type_assign_and_sets] ")" | "{" [type_assign_and_sets ","?] "}"
+struct_members: "(" (type_assign ("," type_assign)*)? ")"
+    | "{" (type_assign ("," type_assign)* ","?)? "}"
+tuple_members: "(" type_expr ("," type_expr)* ")"
+struct_members_with_assign: "(" (type_assign_and_set ("," type_assign_and_set)*)? ")" | "{" type_assign_and_set ("," type_assign_and_set)* ","? "}"
 
 // ENUMS
 ?decl_enum: enum_defn
@@ -109,7 +108,7 @@ enum_variant_unit: ident_pascal
 
 // FUNCTION SYNTAX
 
-fn_args: "(" [type_assigns] ")"
+fn_args: "(" (type_assign ("," type_assign)*)? ")"
 fn_body: "{" (stmt | expr)* "}"
 
 // STATEMENTS
@@ -152,11 +151,15 @@ fn_call_args: expr ("," expr)*
 ?type_expr: ident -> typename
     | decl_type
     | type_expr type_param -> paramzd_type_expr
+    | type_path 
     | type_expr "?" -> option
-    | simple_path 
+    | "?" type_expr -> option
+    | "(" type_expr ("," type_expr)* ")" -> tuple_type
+    | "[" type_expr "]" -> vector_type
+    | "&" type_expr -> ref_type
 
 typename: ident
-simple_path: "::"? ident ("::" ident)*
+type_path: typename ("::" typename)*
 ?decl_type: decl_struct | decl_enum
 ?type_param: "<" type_expr ">"
 

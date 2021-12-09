@@ -84,6 +84,8 @@ contract CW20 {
 		CountResponse { count: $state.config.count }
 	}
 
+	query item() -> struct ItemResponse { item: (?[int], &&[Fire::boy]) }
+
 	// however, we can use another pattern...
 	query user_balance_for_token(user: Addr, token: Addr) responds {
 		#[echo("hello")] user: Addr = user,

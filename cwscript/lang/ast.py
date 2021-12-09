@@ -275,6 +275,29 @@ class _TypeExpr(_Ast):
     @property
     def typestr(self) -> str:
         raise NotImplementedError(f"property {self.__class__}.typestr not implemented")
+@dataclass
+class TupleType(_TypeExpr, ast_utils.AsList):
+    members: List[_TypeExpr]
+    
+    @property
+    def typestr(self) -> str:
+        return f"(" + ",".join(m.typestr for m in self.members) + ")"
+
+@dataclass
+class VectorType(_TypeExpr):
+    item: _TypeExpr
+    
+    @property
+    def typestr(self) -> str:
+        return f"Vec<{self.item.typestr}>"
+
+@dataclass
+class RefType(_TypeExpr):
+    wrapped: _TypeExpr
+    
+    @property
+    def typestr(self) -> str:
+        return f"&{self.wrapped.typestr}"
 
 @dataclass
 class Option(_TypeExpr):
@@ -285,11 +308,20 @@ class Option(_TypeExpr):
         return "Option<{self.wrapped.typestr}>"
 
 @dataclass
-class TypePath(_TypeExpr):
-    pass
+class TypePath(_TypeExpr, ast_utils.AsList):
+    parts: List[Ident]
+   
+    @property 
+    def typestr(self) -> str:
+        return "::".join(self.parts.join())
 
-
-
+@dataclass
+class SimplePath(_Ast, ast_utils.AsList):
+    parts: List[Ident]
+    
+    def __str__(self) -> str:
+        return "::".join(self.parts)
+   
 @dataclass
 class TypeAssign(_Defn):
     name: str
@@ -384,14 +416,6 @@ class StructTupleDefn(StructDefn):
 @dataclass
 class StructUnitDefn(StructDefn):
     name: Ident
-
-@dataclass
-class IdentPath(_Ast, ast_utils.AsList):
-    parts: List[Ident]
-    
-    def __str__(self):
-        return ".".join(str(part) for part in self.parts)
-
 @dataclass
 class MapKey(_Ast):
     key: Ident
@@ -452,7 +476,6 @@ class CWScriptToAST(Transformer):
     events_group = as_list 
     exec_group = as_list 
     state_group = as_list
-    fn_args = as_list
     fn_body = as_list
     fn_call_args = as_list
     type_assign_and_sets = as_list
@@ -460,10 +483,13 @@ class CWScriptToAST(Transformer):
     map_keys = as_list
     struct_val_assigns = as_list
     enum_variant_defns = as_list
-    
-    tuple_members = first
-    struct_members = first
-    struct_members_with_assign = first
+   
+    ## usually if the first elem is:
+    ## RULE: "(" [plural] ")"
+    fn_args = as_list
+    tuple = as_list
+    struct_members = as_list
+    struct_members_with_assign = as_list
     
     ## values
     integer = alias_to(Integer)
@@ -472,3 +498,4 @@ class CWScriptToAST(Transformer):
     assign_op = first
     ident_pascal = alias_to(Ident)
     ident_snake = alias_to(Ident)
+    special_key = alias_to(Ident)
