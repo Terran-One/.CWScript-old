@@ -4,7 +4,7 @@ from typing import List
 from pathlib import Path
 
 from cwscript.lang.parser import parse_cwscript_src
-from cwscript.lang.ast import FileCode, DeclContract, ContractDefn
+from cwscript.lang.ast import ContractDefn
 from cwscript.model import ContractModel
 from cwscript.util.strings import *
 from cwscript.template import contract_crate_templates as templates, render_to_file
@@ -39,9 +39,9 @@ class CWScriptCompiler:
 
         contract_models = []
         for fc in file_codes:
-            for stmt in fc.body:
-                if isinstance(stmt, DeclContract):
-                    contract_models.append(ContractModel.from_ast(stmt.defn))
+            cds = fc.collect_type(ContractDefn)
+            for cd in cds:
+                contract_models.append(ContractModel.from_ast(cd))
 
         if len(contract_models) > 1:
             pass

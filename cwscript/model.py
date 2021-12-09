@@ -2,7 +2,6 @@ from typing import List
 from pathlib import Path
 from dataclasses import dataclass
 
-from cwscript.lang.ast import _DeclStmt, _StateDefn, _QueryDefn
 from cwscript.lang.ast import *
 from cwscript.util.strings import *
 from cwscript.template import contract_crate_templates as templates, render_to_file

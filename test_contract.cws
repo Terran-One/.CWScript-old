@@ -62,7 +62,7 @@ contract CW20 {
 	exec { // you could also do it like this
 		increment() {
 			$state.config.count += 1
-			if ( $state.config.count ) < 2 {
+			if (( $state.config.count )) < 2 {
 				Intensity {
 					item: 23,
 					power23: 722391,

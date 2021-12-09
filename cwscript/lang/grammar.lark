@@ -5,7 +5,7 @@ file_code: root_lvl_stmt*
 ?root_lvl_stmt:
     | decl_contract
 
-decl_contract: contract_defn
+?decl_contract: contract_defn
 
 // CONTRACT BLOCK
 contract_defn: [annotations] "contract" ident_pascal "{" contract_stmts "}"
@@ -24,14 +24,14 @@ contract_stmts: contract_stmt*
 
 // ERROR
 
-decl_error: error_defn | errors_group
+?decl_error: error_defn | errors_group
 error_defn: [annotations] "error" enum_variant
 errors_group: "errors" "{" error_defn2 ("," error_defn2)* ","? "}"
 error_defn2: [annotations] enum_variant
 
 // EVENT
 
-decl_event: event_defn | events_group
+?decl_event: event_defn | events_group
 event_defn: [annotations] "event" enum_variant
 events_group: "events" "{" event_defn2 ("," event_defn2)* ","? "}"
 event_defn2: [annotations] enum_variant
@@ -51,19 +51,19 @@ map_defn2: [annotations] ident map_keys ":" type_expr
 
 // INSTANTIATE DECLARATION
 
-decl_instantiate: instantiate_defn
+?decl_instantiate: instantiate_defn
 instantiate_defn: [annotations] "instantiate" fn_args [fn_body]
 
 // EXECUTE DECLARATION
 
-decl_exec: exec_defn | exec_group
+?decl_exec: exec_defn | exec_group
 exec_defn: [annotations] "exec" ident fn_args [fn_body]
 exec_group: "exec" "{" exec_defn2+ "}"
 exec_defn2: [annotations] ident fn_args [fn_body]
 
 // QUERY DECLARATIONS
 
-decl_query: query_defn | query_group
+?decl_query: query_defn | query_group
 query_defn: [annotations] "query" ident fn_args "->" type_expr [fn_body] -> query_defn_fn
     | [annotations] "query" ident fn_args "responds" struct_members_with_assign -> query_defn_responds
 query_group: "query" "{" query_defn2+ "}"
@@ -149,9 +149,9 @@ fn_call_args: expr ("," expr)*
 
 // TYPE SYSTEM
 ?type_expr: ident -> typename
-    | decl_type
     | type_expr type_param -> paramzd_type_expr
     | type_path 
+    | decl_type
     | type_expr "?" -> option
     | "?" type_expr -> option
     | "(" type_expr ("," type_expr)* ")" -> tuple_type

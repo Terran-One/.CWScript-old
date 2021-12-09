@@ -11,35 +11,25 @@ def iis(test, *types: list) -> bool:
     """Returns `True` if `isinstance(test, t)` works for ANY `t` in `types`"""
     return any(isinstance(test, t) for t in types)
 
+def collect(item, predicate):
+    nodes = []
+    if predicate(item):
+        nodes.append(item)
+    if not iis(item, _Ast, list, tuple):
+        return nodes
+    if iis(item, _Ast):
+        for child in item.__dict__.values():
+            nodes.extend(collect(child, predicate))
+    if iis(item, list, tuple):
+        for elem in item:
+            nodes.extend(collect(elem, predicate))
+    return nodes
 
 ## AST Nodes
 class _Ast(ast_utils.Ast):
     def collect(self, predicate: Callable[[Any], bool], *, dfs: bool = True) -> list:
         """Gets children for which the provided predicate returns True."""
-        nodes = []
-        for (key, child) in self.__dict__.items():
-            if predicate(child):
-                nodes.append(child)
-            if dfs:
-                if iis(child, _Ast):
-                    nodes.extend(child.collect(predicate, dfs=True))
-                elif iis(child, list, tuple):
-                    for elem in child:
-                        if predicate(elem):
-                            nodes.append(elem)
-                        if iis(elem, _Ast):
-                            nodes.extend(elem.collect(predicate, dfs=True))
-        if not dfs:
-            for (key, child) in self.__dict__.items():
-                if iis(child, _Ast):
-                    nodes.extend(child.collect(predicate, dfs=False))
-                elif iis(child, list, tuple):
-                    for elem in child:
-                        if predicate(elem):
-                            nodes.append(elem)
-                        if iis(elem, _Ast):
-                            nodes.extend(elem.collect(predicate, dfs=False))
-        return nodes
+        return collect(self, predicate)
 
     def collect_type(self, *types, **kwargs):
         return self.collect(lambda x: iis(x, *types), **kwargs)
@@ -90,28 +80,10 @@ class _ContractStmt(_Ast):
     pass
 
 
-class _DeclStmt(_Ast):
-    class Types:
-        CONTRACT = "contract"
-        ERROR = "error"
-        EVENT = "event"
-        STATE = "state"
-        INSTANTIATE = "instantiate"
-        EXEC = "exec"
-        QUERY = "query"
-        STRUCT = "struct"
-        ENUM = "enum"
-
-
 @dataclass
 class ContractDefn(_Defn):
     name: str
     body: List[_ContractStmt]
-
-
-@dataclass
-class DeclContract(_DeclStmt):
-    defn: ContractDefn
 
 @dataclass
 class EnumVariantDefn(_Defn):
@@ -139,23 +111,8 @@ class ErrorDefn(_Defn):
     defn: _EnumVariant
 
 @dataclass
-class DeclError(_DeclStmt, ast_utils.AsList):
-    defns: List["ErrorDefn"]
-
-
-@dataclass
 class EventDefn(_Defn):
     defn: _EnumVariant
-
-@dataclass
-class DeclEvent(_DeclStmt, ast_utils.AsList):
-    defns: list
-
-
-@dataclass
-class DeclExec(_DeclStmt, ast_utils.AsList):
-    defns: list
-
 
 class _StateDefn(_Defn):
     pass
@@ -230,10 +187,6 @@ class IfElseIfElseExpr(_Ast):
     else_if_clauses: str
     else_clause: str
 
-
-@dataclass
-class DeclQuery(_DeclStmt, ast_utils.AsList):
-    defns: List["_QueryDefn"]
 
 
 @dataclass
@@ -359,11 +312,6 @@ class InstantiateDefn(_Defn):
 
 
 @dataclass
-class DeclInstantiate(_DeclStmt):
-    defn: "InstantiateDefn"
-
-
-@dataclass
 class TypeAssignAndSet(_Ast):
     type_assign: "TypeAssign"
     value: str
@@ -391,11 +339,6 @@ class EnumDefn(_Defn, _TypeExpr):
     def typestr(self) -> str:
         return self.name
 
-
-
-@dataclass
-class DeclState(_DeclStmt, ast_utils.AsList):
-    defns: list
 
 @dataclass
 class StructDefn(_Defn, _TypeExpr):
@@ -460,14 +403,27 @@ alias_to = lambda t: lambda _, x: t(*x)
 ## Transformer
 class CWScriptToAST(Transformer):
 
+
     error_defn2 = alias_to(ErrorDefn)
     event_defn2 = alias_to(EventDefn)
+    
     ## state
     item_defn2 = alias_to(ItemDefn) 
     map_defn2 = alias_to(MapDefn)
     exec_defn2 = alias_to(ExecDefn)
+    
     query_defn_fn2 = alias_to(QueryDefnFn)
     query_defn_responds2 = alias_to(QueryDefnResponds)
+    
+    decl_contract = as_list 
+    decl_error = as_list
+    decl_event = as_list
+    decl_state = as_list
+    decl_instantiate = as_list
+    decl_exec = as_list
+    decl_query = as_list
+    decl_type = as_list
+    
    
     annotations = as_list
     annotation_items = as_list

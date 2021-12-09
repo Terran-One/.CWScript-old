@@ -7,8 +7,8 @@ pub enum ContractError {
 #[error("{0}")]
 Std(#[from] StdError),
 {%- for err in errors -%}
-{{ err.name }} {
-{%- for member in err.members -%}
+{{ err.defn.name }} {
+{%- for member in err.defn.members -%}
 {{ member.name }}: {{ member.type.typestr }},
 {%- endfor -%}
 },
