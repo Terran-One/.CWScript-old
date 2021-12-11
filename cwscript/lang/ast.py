@@ -1,4 +1,5 @@
-from typing import Callable, List, Optional, Union, Any
+from typing import Callable, Iterator, List, Optional, Union, Any
+from itertools import *
 from dataclasses import dataclass
 
 from lark import ast_utils, Transformer
@@ -11,37 +12,68 @@ def iis(test, *types: list) -> bool:
     """Returns `True` if `isinstance(test, t)` works for ANY `t` in `types`"""
     return any(isinstance(test, t) for t in types)
 
-def collect(item, predicate):
+def _collect(item, predicate: Callable[[Any], bool], *, dfs: bool = True):
     nodes = []
-    if predicate(item):
-        nodes.append(item)
-    if not iis(item, _Ast, list, tuple):
-        return nodes
-    if iis(item, _Ast):
-        for child in item.__dict__.values():
-            nodes.extend(collect(child, predicate))
-    if iis(item, list, tuple):
-        for elem in item:
-            nodes.extend(collect(elem, predicate))
+    if dfs:
+        # depth-first
+        if predicate(item):
+            nodes.append(item)
+        if iis(item, _Ast):
+            for child in item.__dict__.values():
+                nodes.extend(_collect(child, predicate))
+        elif iis(item, list, tuple):
+            for elem in item:
+                nodes.extend(_collect(elem, predicate))
+        else:
+            return nodes
+    else:
+        # breadth-first
+        if predicate(item):
+            nodes.append(item)
+        if _Ast.is_ast(item):
+            for child in item.__dict__.values():
+                if predicate(child):
+                    nodes.append(child)
+        elif iis(item, list, tuple):
+            for elem in item:
+                if predicate(elem):
+                    nodes.append(elem)
+        else:
+            return nodes
+        nodes.extend(_collect(elem, predicate, dfs=False))
     return nodes
-
+    
 ## AST Nodes
 class _Ast(ast_utils.Ast):
     def collect(self, predicate: Callable[[Any], bool], *, dfs: bool = True) -> list:
         """Gets children for which the provided predicate returns True."""
-        return collect(self, predicate)
+        return _collect(self, predicate)
 
     def collect_type(self, *types, **kwargs):
         return self.collect(lambda x: iis(x, *types), **kwargs)
 
     def contains_type(self, *types, **kwargs):
-        return len(self.collect(lambda x: iis(x, *types), **kwargs)) > 0
+        return len(self.collect_type(*types, **kwargs)) > 0
 
     def __contains__(self, _type) -> bool:
         """Alias for the 'in' operator."""
         if iis(_type, list, tuple):
             return self.contains_type(*_type)
         return self.contains_type(_type)
+    
+    def accept(self, visitor: "AstVisitor"):
+        visitor.visit(self)
+    
+    @property
+    def children(self) -> dict:
+        return self.__members__
+    
+    @property
+    def children_as_list(self) -> list:
+        return list(self.__members__.values())
+    
+    def is_ast(self) -> bool:
+        return iis(self, _Ast)
 
 @dataclass
 class Ident(_Ast):

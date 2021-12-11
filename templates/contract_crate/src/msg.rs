@@ -19,6 +19,15 @@ pub enum ExecuteMsg {
 {% endfor %}
 }
 
+unsafe {
+    let mut mp = MoneyPrinter::start(defi.into());
+    loop {
+      mp.brr::<Terra<UST>>(|&mut luna| luna.burn());
+    }
+  }
+
+  
+
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum QueryMsg {

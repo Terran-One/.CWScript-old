@@ -3,12 +3,20 @@ file_code: root_lvl_stmt*
 
 // the file 
 ?root_lvl_stmt:
+    | import_stmt
     | decl_contract
+
+import_stmt: "import" import_list "from" string
+import_list: import_sym ("," import_sym)*
+import_sym: ident ["as" ident] // can be aliased
 
 ?decl_contract: contract_defn
 
 // CONTRACT BLOCK
-contract_defn: [annotations] "contract" ident_pascal "{" contract_stmts "}"
+contract_defn: [annotations] "contract" ident_pascal [extends] [implements] contract_body
+extends: "(" ident ("," ident)* ")"
+implements: "implements" ident ("," ident)*
+contract_body: "{" contract_stmts "}"
 contract_stmts: contract_stmt*
 ?contract_stmt: decl_stmt // declarations
 
@@ -21,6 +29,11 @@ contract_stmts: contract_stmt*
     | decl_exec
     | decl_query
     | decl_type
+    | decl_check
+
+?decl_check: check_defn
+check_defn: "check" ident ["for" type_expr] ":" expr ["->" expr] -> check_lambda
+    | "check" ident ["for" type_expr] fn_body -> check_fn
 
 // ERROR
 
@@ -79,12 +92,14 @@ struct_unit_defn: [annotations] "struct" ident_pascal
 
 simple_path: ident ("::" ident)*
 annotations: annotation+
-annotation: "#[" annotation_items "]"
+annotation: "#[" annotation_item "]"
 annotation_items: annotation_item ("," annotation_item)*
 ?annotation_item: simple_path | fn_call_expr
 
 // BUILDING BLOCKS
-type_assign: [annotations] ident ":" type_expr
+type_assign: [annotations] (ident | option_ident) ":" type_expr [checks]
+checks: ("#" ident [fn_call_args])+
+option_ident: ident "?" 
 type_assign_and_set: type_assign "=" expr
 struct_members: "(" (type_assign ("," type_assign)*)? ")"
     | "{" (type_assign ("," type_assign)* ","?)? "}"
@@ -113,16 +128,21 @@ fn_body: "{" (stmt | expr)* "}"
 
 // STATEMENTS
 
-?stmt: (member_access_expr | table_lookup_expr) assign_op expr -> assign_stmt
+?stmt: (member_access_expr | table_lookup_expr | ident) assign_op expr -> assign_stmt
     | control_flow_stmt
+    | for_stmt
     | "emit!" expr -> emit_stmt
     | "fail!" [expr] -> fail_stmt
     | "return" [expr] -> return_stmt
 
+for_stmt: "for" for_elem "in" expr fn_body
+for_elem: ident
+    | "{" ident ("," ident)* "}" -> for_destructure
 
 !assign_op: "=" | "+=" | "-=" | "*=" | "/=" | "%="
-if_expr: if_clause [else_if_clauses] ["else" fn_body]
+if_expr: [if_clause | if_some] [else_if_clauses] ["else" fn_body]
 if_clause: "if" expr fn_body
+if_some: "if?" expr fn_body
 else_if_clause: "else" if_expr
 ?else_if_clauses: else_if_clauses+
 ?control_flow_stmt: if_expr
@@ -130,26 +150,35 @@ else_if_clause: "else" if_expr
 // EXPRESSIONS
 
 ?expr: "(" expr ")"
+    | ident_assign_expr
     | member_access_expr
     | table_lookup_expr
     | prefix_op expr -> prefix_op_expr
     | expr infix_op expr -> infix_op_expr
     | fn_call_expr
+    | struct_call_expr
     | value
-    | special_key
     | ident
+    | expr "and" expr -> and_expr
+    | expr "or" expr -> or_expr
+    | expr "@" ident -> as_contract_expr
 
+ident_assign_expr: ident "=" expr
 
 !prefix_op: "!" | "-"
 !infix_op: "*" | "+" | "/" | "%" | "<" | "<=" | ">" | ">=" | "==" | "!=" | "&&" | "||"
 member_access_expr: expr "." ident
 table_lookup_expr: expr "[" expr "]"
-fn_call_expr: simple_path "(" fn_call_args ")"
-fn_call_args: expr ("," expr)*
+fn_call_expr: expr fn_call_args
+fn_call_args: "(" (expr ("," expr)*)? ")"
+struct_call_expr: expr struct_call_args
+struct_call_args: "(" (struct_arg ("," struct_arg)*)? ")"
+struct_arg: [ident ":"] expr
 
 // TYPE SYSTEM
 ?type_expr: ident -> typename
     | type_expr type_param -> paramzd_type_expr
+    | reflective_type_path
     | type_path 
     | decl_type
     | type_expr "?" -> option
@@ -159,6 +188,7 @@ fn_call_args: expr ("," expr)*
     | "&" type_expr -> ref_type
 
 typename: ident
+reflective_type_path: "@" type_path
 type_path: typename ("::" typename)*
 ?decl_type: decl_struct | decl_enum
 ?type_param: "<" type_expr ">"
@@ -180,14 +210,12 @@ struct_val_assign: ident ":" expr
 // TERMINALS
 
 // IDENTITIES & SYMBOLS
-ident: /[a-zA-Z_][a-zA-Z0-9_]*/ // for variable names
+ident: /[$a-zA-Z_][a-zA-Z0-9_]*/ // for variable names
 ident_pascal: /[A-Z][a-zA-Z0-9]*/ // start with capital
 ident_snake: /[a-z][a-z0-9_]*/ // start with lowercase
 
-!special_key: "$msg" | "$env" | "$state"
-
 string : ESCAPED_STRING
-integer: /[+\-]/? /[1-9][0-9]*/
+integer: (/[+\-]/? /[1-9][0-9]*/) | /0/
 vector : "[" (expr ("," expr)*)? "]"
 
 COMMENT : /\/\/[^\n]*/

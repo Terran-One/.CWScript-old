@@ -580,11 +580,20 @@ FileCode(
                                 name=Ident(symbol=Token("__ANON_16", "item")),
                                 type=TupleType(
                                     members=[
-                                        Option(
-                                            wrapped=VectorType(
-                                                item=Typename(
-                                                    name=Ident(
-                                                        symbol=Token("__ANON_16", "int")
+                                        VectorType(
+                                            item=Option(
+                                                wrapped=Option(
+                                                    wrapped=Option(
+                                                        wrapped=Option(
+                                                            wrapped=Typename(
+                                                                name=Ident(
+                                                                    symbol=Token(
+                                                                        "__ANON_16",
+                                                                        "int",
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
                                                     )
                                                 )
                                             )

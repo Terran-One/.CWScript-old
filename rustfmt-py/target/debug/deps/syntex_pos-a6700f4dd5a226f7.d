@@ -1,0 +1,9 @@
+/Users/william/t1/cwscript/rustfmt-py/target/debug/deps/syntex_pos-a6700f4dd5a226f7.rmeta: /Users/william/.cargo/registry/src/github.com-1ecc6299db9ec823/syntex_pos-0.59.1/src/lib.rs /Users/william/.cargo/registry/src/github.com-1ecc6299db9ec823/syntex_pos-0.59.1/src/hygiene.rs /Users/william/.cargo/registry/src/github.com-1ecc6299db9ec823/syntex_pos-0.59.1/src/symbol.rs
+
+/Users/william/t1/cwscript/rustfmt-py/target/debug/deps/libsyntex_pos-a6700f4dd5a226f7.rlib: /Users/william/.cargo/registry/src/github.com-1ecc6299db9ec823/syntex_pos-0.59.1/src/lib.rs /Users/william/.cargo/registry/src/github.com-1ecc6299db9ec823/syntex_pos-0.59.1/src/hygiene.rs /Users/william/.cargo/registry/src/github.com-1ecc6299db9ec823/syntex_pos-0.59.1/src/symbol.rs
+
+/Users/william/t1/cwscript/rustfmt-py/target/debug/deps/syntex_pos-a6700f4dd5a226f7.d: /Users/william/.cargo/registry/src/github.com-1ecc6299db9ec823/syntex_pos-0.59.1/src/lib.rs /Users/william/.cargo/registry/src/github.com-1ecc6299db9ec823/syntex_pos-0.59.1/src/hygiene.rs /Users/william/.cargo/registry/src/github.com-1ecc6299db9ec823/syntex_pos-0.59.1/src/symbol.rs
+
+/Users/william/.cargo/registry/src/github.com-1ecc6299db9ec823/syntex_pos-0.59.1/src/lib.rs:
+/Users/william/.cargo/registry/src/github.com-1ecc6299db9ec823/syntex_pos-0.59.1/src/hygiene.rs:
+/Users/william/.cargo/registry/src/github.com-1ecc6299db9ec823/syntex_pos-0.59.1/src/symbol.rs:

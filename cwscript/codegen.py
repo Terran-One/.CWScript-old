@@ -1,19 +1,16 @@
 from cwscript.util.context_env import Context, Env
 from cwscript.template import codegen_templates as templates
-from cwscript.lang.ast import _QueryDefn, StructDefn
 from cwscript.lang.ast import *
 from cwscript.util.strings import pascal_to_snake, snake_to_pascal
-
 
 class CGContext(Context):
     pass
 
-
 class CGEnv(Env):
     pass
 
-
 class ContractCodegen:
+
     def __init__(self, contract_defn: ContractDefn):
         self.defn = contract_defn
         self.errors = self.defn.collect_type(ErrorDefn)
@@ -29,7 +26,6 @@ class ContractCodegen:
 
     def gen_contract(self) -> str:
         return templates["contract"].render(contract=self)
-
 
 class ICodegen:
     """Interface to allow for code generation.
@@ -69,21 +65,3 @@ class ICodegen:
 def render(template_name: str, **kwargs):
     template = templates[template_name]
     return template.render(**kwargs)
-
-
-class CGStructDefn(ICodegen):
-    """Subclass inside a StructDefn-like `_Ast` node to add codegen."""
-
-    def _verify(self, env: CGEnv):
-        if self.members is None:
-            self.members = []
-        if self.body is None:
-            self.body = []
-
-    def _gen_code(self, env: CGEnv) -> str:
-        return render("struct_defn", struct=self, env=env)
-
-
-def iis(test, *types) -> bool:
-    """Returns `True` if `isinstance(test, t)` works for ANY `t` in `types`"""
-    return any(isinstance(test, t) for t in types)

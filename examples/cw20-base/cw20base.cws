@@ -1,0 +1,100 @@
+import CW20 from "cw20.cws"
+
+contract CW20Base implements CW20 {
+
+    state token_info: @CW20::structs::TokenInfo
+    state balances[user: Addr]: Uint128 
+
+    instantiate(
+        name: String,
+        symbol: String,
+        decimals: u8,
+        initial_balances: [struct Cw20Coin { address: Addr, amount: Uint128 }],
+        mint?: @CW20::query::mint::response
+    ) {
+        total_supply = Uint128(0)
+        for { address, amount } in initial_balances {
+            $state.balances[address]
+            total_supply += amount
+        }
+
+        $state.token_info = TokenInfo {
+            name: name,
+            symbol: symbol,
+            decimals: decimals,
+            total_supply: total_supply,
+        }
+    }
+
+    check not0: $arg == 0 -> InvalidZeroAmount
+
+    check not0 {
+        if $arg == 0 {
+            fail InvalidZeroAmount
+        }
+    }
+
+    // translates into:
+    // if ($arg == 0) {
+    //   fail! InvalidZeroAmount
+    // }
+
+    check valid for Addr: $api.addr_validate($arg)
+
+    exec transfer(recipient: Addr, amount: Uint128#not0) {
+        $state.balances[$msg.sender] -= amount
+        $state.balances[recipient] += amount
+        emit! Transfer($msg.sender, recipient, amount)
+    }
+
+    exec burn(amount: Uint128#not0) {
+        $state.balances[$info.sender] -= amount
+        $state.token_supply -= amount
+        emit! Burn($info.sender, amount)
+    }
+
+    exec mint(recipient: Addr#valid, amount: Uint128#not0) {
+        config = $state.token_info
+        if (config.mint == None) or (config.mint.minter != $msg.sender) {
+            fail! Unauthorized 
+        }
+
+        config.total_supply += amount
+        if? (limit = config.get_cap()) and config.total_supply > limit {
+            fail! CannotExceedCap
+        }
+
+        $state.token_info = config
+        $state.balances[recipient] += amount
+        emit! Mint(recipient, amount)
+    }
+
+    exec send(contract: Addr#valid, amount: Uint128#non0, msg: Binary) {
+        $state.balances[$msg.sender] -= amount
+        $state.balances[contract] += amount
+        emit! Send($msg.sender, contract, amount)
+        exec! (CW @ CW20Receiver).receive(sender: $msg.sender, amount, msg)
+    }
+
+    query balance(address: Addr#valid) responds {
+        balance: Uint128 = $state.balances[address] or 0
+    }
+
+    query token_info() responds {
+        token_info: TokenInfo = $state.token_info
+    }
+
+    query minter() -> @CW20::query::minter::response? {
+        meta = $state.token_info
+        if? meta.minter {
+            return minter
+        } else {
+            return None
+        }
+    }
+    
+}
+
+contract MyToken(CW20Base) implements CW20, CW721 {
+
+}

@@ -1,0 +1,55 @@
+interface CW20 {
+
+    struct TokenInfo {
+        name: String,
+        symbol: String,
+        decimals: u8,
+        total_supply: Uint128,
+        mint?: MinterData
+    }
+
+    exec {
+        transfer(recipient: Addr, amount: Uint128)
+        send(contract: Addr, amount: Addr, msg: Msg)
+        increase_allowance(spender: Addr, amount: Uint128, expires?: Expiration)
+        decrease_allowance(spender: Addr, amount: Uint128, expires?: Expiration)
+        transfer_from(owner: Addr, recipient: Addr, amount: Uint128)
+        send_from(owner: Addr, contract: Addr, amount: Uint128, msg: Binary)
+        burn_from(owner: Addr, amount: Uint128)
+        mint(recipient: String, amount: Uint128)
+    }
+
+    query {
+        balance(address: Addr) responds {
+            balance: Uint128
+        }
+        token_info() responds {
+            name: String,
+            symbol: String,
+            decimals: u8,
+            total_supply: Uint128
+        }
+        allowance(owner: String, spender: String) responds {
+            allowance: Uint128,
+            expires: Expiration
+        }
+        minter() repsponds (minter: Addr, cap?: Uint128)
+        marketing_info() responds {
+            project?: String,
+            description?: String,
+            logo?: LogoInfo,
+            marketing?: Addr
+        }
+        download_logo(mime_type: String, data: Binary)
+        all_allowances(
+            owner: Addr,
+            start_after?: Addr,
+            limit?: u32
+        ) responds {
+            allowances: AllowanceInfo[]   
+        }
+        all_accounts(owner: Addr, start_after?: Addr, limit?: u32) responds {
+            accounts: Addr[]
+        }
+    }
+}
