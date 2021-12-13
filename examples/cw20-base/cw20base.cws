@@ -30,7 +30,7 @@ contract CW20Base implements CW20 {
 
     check not0 {
         if $arg == 0 {
-            fail InvalidZeroAmount
+            fail! InvalidZeroAmount
         }
     }
 

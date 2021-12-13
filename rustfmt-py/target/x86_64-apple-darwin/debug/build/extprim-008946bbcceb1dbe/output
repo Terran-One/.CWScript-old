@@ -1,2 +1,0 @@
-cargo:rustc-cfg=extprim_channel="stable"
-cargo:rustc-cfg=extprim_has_stable_i128

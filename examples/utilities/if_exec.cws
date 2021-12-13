@@ -1,0 +1,12 @@
+contract Utilities {
+    exec if_exec(origin: Addr, msg: MsgExecuteMsg, branch: MsgExecuteMsg) {
+        call! msg
+    }
+
+    exec until_fail(call: MsgExecuteMsg) {
+    }
+
+    exec revert_tx() {
+        exec
+    }
+}
