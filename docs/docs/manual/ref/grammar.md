@@ -1,0 +1,229 @@
+# Grammar Definition
+
+```lark
+// CWScript Grammar v0.0.2 - 12/5/21
+file_code: root_lvl_stmt*
+
+// the file
+?root_lvl_stmt:
+    | import_stmt
+    | decl_contract
+
+import_stmt: "import" import_list "from" string
+import_list: import_sym ("," import_sym)*
+import_sym: ident ["as" ident] // can be aliased
+
+?decl_contract: contract_defn
+
+// CONTRACT BLOCK
+contract_defn: [annotations] "contract" ident_pascal [extends] [implements] contract_body
+extends: "(" ident ("," ident)* ")"
+implements: "implements" ident ("," ident)*
+contract_body: "{" contract_stmts "}"
+contract_stmts: contract_stmt*
+?contract_stmt: decl_stmt // declarations
+
+// Member Definition
+
+?decl_stmt: decl_error
+    | decl_event
+    | decl_state
+    | decl_instantiate
+    | decl_exec
+    | decl_query
+    | decl_type
+    | decl_check
+
+?decl_check: check_defn
+check_defn: "check" ident ["for" type_expr] ":" expr ["->" expr] -> check_lambda
+    | "check" ident ["for" type_expr] fn_body -> check_fn
+
+// ERROR
+
+?decl_error: error_defn | errors_group
+error_defn: [annotations] "error" enum_variant
+errors_group: "errors" "{" error_defn2 ("," error_defn2)* ","? "}"
+error_defn2: [annotations] enum_variant
+
+// EVENT
+
+?decl_event: event_defn | events_group
+event_defn: [annotations] "event" enum_variant
+events_group: "events" "{" event_defn2 ("," event_defn2)* ","? "}"
+event_defn2: [annotations] enum_variant
+
+// STATE
+
+?decl_state: state_defn | state_group
+?state_defn: item_defn | map_defn
+item_defn: [annotations] "state" ident ":" type_expr
+map_defn: [annotations] "state" ident map_keys ":" type_expr
+map_keys: map_key+
+map_key: "[" [ident ":"] type_expr "]"
+state_group: "state" "{" state_defn2 ("," state_defn2)* ","? "}"
+?state_defn2: item_defn2 | map_defn2
+item_defn2: [annotations] ident ":" type_expr
+map_defn2: [annotations] ident map_keys ":" type_expr
+
+// INSTANTIATE DECLARATION
+
+?decl_instantiate: instantiate_defn
+instantiate_defn: [annotations] "instantiate" fn_args [fn_body]
+
+// EXECUTE DECLARATION
+
+?decl_exec: exec_defn | exec_group
+exec_defn: [annotations] "exec" ident fn_args [fn_body]
+exec_group: "exec" "{" exec_defn2+ "}"
+exec_defn2: [annotations] ident fn_args [fn_body]
+
+// QUERY DECLARATIONS
+
+?decl_query: query_defn | query_group
+query_defn: [annotations] "query" ident fn_args "->" type_expr [fn_body] -> query_defn_fn
+    | [annotations] "query" ident fn_args "responds" struct_members_with_assign -> query_defn_responds
+query_group: "query" "{" query_defn2+ "}"
+query_defn2: [annotations] ident fn_args "->" type_expr [fn_body] -> query_defn_fn2
+    | [annotations] ident fn_args "responds" struct_members_with_assign -> query_defn_responds2
+
+?decl_struct: struct_c_defn | struct_tuple_defn | struct_unit_defn
+struct_c_defn: [annotations] "struct" ident_pascal struct_members
+struct_tuple_defn: [annotations] "struct" ident_pascal tuple_members
+struct_unit_defn: [annotations] "struct" ident_pascal
+
+// ANNOTATIONS
+
+simple_path: ident ("::" ident)*
+annotations: annotation+
+annotation: "#[" annotation_item "]"
+annotation_items: annotation_item ("," annotation_item)*
+?annotation_item: simple_path | fn_call_expr
+
+// BUILDING BLOCKS
+type_assign: [annotations] (ident | option_ident) ":" type_expr [checks]
+checks: ("#" ident [fn_call_args])+
+option_ident: ident "?"
+type_assign_and_set: type_assign "=" expr
+struct_members: "(" (type_assign ("," type_assign)*)? ")"
+    | "{" (type_assign ("," type_assign)* ","?)? "}"
+tuple_members: "(" type_expr ("," type_expr)* ")"
+struct_members_with_assign: "(" (type_assign_and_set ("," type_assign_and_set)*)? ")" | "{" type_assign_and_set ("," type_assign_and_set)* ","? "}"
+
+// ENUMS
+?decl_enum: enum_defn
+enum_defn: [annotations] "enum" ident_pascal "{" [enum_variant_defns] "}"
+enum_variant_defns: enum_variant_defn ("," enum_variant_defn)*
+enum_variant_defn: [annotation] enum_variant
+?enum_variant: enum_variant_struct // typed args
+    | enum_variant_tuple // no typed args
+    | enum_variant_unit // no args
+enum_variant_struct: ident_pascal struct_members
+enum_variant_tuple: ident_pascal tuple_members
+enum_variant_unit: ident_pascal
+
+// STRUCTS
+
+
+// FUNCTION SYNTAX
+
+fn_args: "(" (type_assign ("," type_assign)*)? ")"
+fn_body: "{" (stmt | expr)* "}"
+
+// STATEMENTS
+
+?stmt: (member_access_expr | table_lookup_expr | ident) assign_op expr -> assign_stmt
+    | control_flow_stmt
+    | for_stmt
+    | "emit!" expr -> emit_stmt
+    | "fail!" [expr] -> fail_stmt
+    | "return" [expr] -> return_stmt
+
+for_stmt: "for" for_elem "in" expr fn_body
+for_elem: ident
+    | "{" ident ("," ident)* "}" -> for_destructure
+
+!assign_op: "=" | "+=" | "-=" | "*=" | "/=" | "%="
+if_expr: [if_clause | if_some] [else_if_clauses] ["else" fn_body]
+if_clause: "if" expr fn_body
+if_some: "if?" expr fn_body
+else_if_clause: "else" if_expr
+?else_if_clauses: else_if_clauses+
+?control_flow_stmt: if_expr
+
+// EXPRESSIONS
+
+?expr: "(" expr ")"
+    | ident_assign_expr
+    | member_access_expr
+    | table_lookup_expr
+    | prefix_op expr -> prefix_op_expr
+    | expr infix_op expr -> infix_op_expr
+    | fn_call_expr
+    | struct_call_expr
+    | value
+    | ident
+    | expr "and" expr -> and_expr
+    | expr "or" expr -> or_expr
+    | expr "@" ident -> as_contract_expr
+
+ident_assign_expr: ident "=" expr
+
+!prefix_op: "!" | "-"
+!infix_op: "*" | "+" | "/" | "%" | "<" | "<=" | ">" | ">=" | "==" | "!=" | "&&" | "||"
+member_access_expr: expr "." ident
+table_lookup_expr: expr "[" expr "]"
+fn_call_expr: expr fn_call_args
+fn_call_args: "(" (expr ("," expr)*)? ")"
+struct_call_expr: expr struct_call_args
+struct_call_args: "(" (struct_arg ("," struct_arg)*)? ")"
+struct_arg: [ident ":"] expr
+
+// TYPE SYSTEM
+?type_expr: ident -> typename
+    | type_expr type_param -> paramzd_type_expr
+    | reflective_type_path
+    | type_path
+    | decl_type
+    | type_expr "?" -> option
+    | "?" type_expr -> option
+    | "(" type_expr ("," type_expr)* ")" -> tuple_type
+    | "[" type_expr "]" -> vector_type
+    | "&" type_expr -> ref_type
+
+typename: ident
+reflective_type_path: "@" type_path
+type_path: typename ("::" typename)*
+?decl_type: decl_struct | decl_enum
+?type_param: "<" type_expr ">"
+
+// VALS
+
+?value: struct_val
+    | vector
+    | string
+    | integer
+    | "true" -> true
+    | "false" -> false
+
+struct_val: ident_pascal "{" [struct_val_assigns] ","? "}"
+    | ident_pascal "(" [struct_val_assigns] ")"
+struct_val_assigns: struct_val_assign ("," struct_val_assign)*
+struct_val_assign: ident ":" expr
+
+// TERMINALS
+
+// IDENTITIES & SYMBOLS
+ident: /[$a-zA-Z_][a-zA-Z0-9_]*/ // for variable names
+ident_pascal: /[A-Z][a-zA-Z0-9]*/ // start with capital
+ident_snake: /[a-z][a-z0-9_]*/ // start with lowercase
+
+string : ESCAPED_STRING
+integer: (/[+\-]/? /[1-9][0-9]*/) | /0/
+vector : "[" (expr ("," expr)*)? "]"
+
+COMMENT : /\/\/[^\n]*/
+%ignore COMMENT
+%import common.ESCAPED_STRING
+%import common.WS
+%ignore WS
+```
