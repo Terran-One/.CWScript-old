@@ -30,23 +30,6 @@ class CWScriptCompiler:
         with open(self._getpath(src_file_path), "r"):
             self.src_files.append(src_file_path)
 
-    def compile(self, target_dir: PathLike, name: str = None):
-        file_codes = []
-        for s in self.src_files:
-            with open(s, "r") as src_file:
-                ast = parse_cwscript_src(src_file.read())
-                file_codes.append(ast)
-
-        contract_models = []
-        for fc in file_codes:
-            cds = fc.collect_type(ContractDefn)
-            for cd in cds:
-                contract_models.append(ContractModel.from_ast(cd))
-
-        if len(contract_models) > 1:
-            pass
-        else:
-            pass
 
     def generate_crate(
         self,

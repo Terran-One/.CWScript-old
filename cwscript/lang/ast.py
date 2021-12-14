@@ -60,10 +60,7 @@ class _Ast(ast_utils.Ast):
         if iis(_type, list, tuple):
             return self.contains_type(*_type)
         return self.contains_type(_type)
-    
-    def accept(self, visitor: "AstVisitor"):
-        visitor.visit(self)
-    
+
     @property
     def children(self) -> dict:
         return self.__members__
@@ -114,6 +111,13 @@ class _ContractStmt(_Ast):
 
 @dataclass
 class ContractDefn(_Defn):
+    name: str
+    parents: List[Ident]
+    interfaces: List[Ident]
+    body: List[_ContractStmt]
+
+@dataclass
+class InterfaceDefn(_Defn):
     name: str
     body: List[_ContractStmt]
 
@@ -181,6 +185,10 @@ class InfixOpExpr(_Ast):
     op: str
     rhs: str
 
+@dataclass
+class PrefixOpExpr(_Ast):
+    op: str
+    arg: str
 
 @dataclass
 class MemberAccessExpr(_Ast):
@@ -212,6 +220,14 @@ class IfClause(_Ast):
     predicate: str
     body: str
 
+@dataclass
+class IfSome(_Ast):
+    predicate: str
+    body: str
+
+@dataclass
+class OptionIdent(_Ast):
+    ident: Ident
 
 @dataclass
 class ElseIfClause(_Ast):
@@ -313,11 +329,18 @@ class SimplePath(_Ast, ast_utils.AsList):
     
     def __str__(self) -> str:
         return "::".join(str(x) for x in self.parts)
-   
+
+@dataclass
+class ReflectiveTypePath(_Ast):
+    type_path: TypePath
+       
+    def __str__(self) -> str:
+        return "::".join(str(x) for x in self.parts)
 @dataclass
 class TypeAssign(_Defn):
     name: Ident 
     type: _TypeExpr
+    checks: list
 
 
 @dataclass
@@ -362,6 +385,38 @@ class AssignStmt(_Stmt):
     assign_op: str
     rhs: str
 
+@dataclass
+class ForStmt(_Stmt):
+    for_elems: str
+    iterable: str
+    body: str
+
+@dataclass
+class CheckLambda(_Ast):
+    name: Ident
+    type_bound: _TypeExpr
+    predicate: _Expr
+    error_type: _TypeExpr
+
+@dataclass
+class CheckFn(_Ast):
+    name: Ident
+    type_bound: _TypeExpr
+    body: list
+
+@dataclass
+class ForDestructure(_Ast, ast_utils.AsList):
+    idents: Ident 
+
+@dataclass
+class StructCallExpr(_Expr):
+    fn: MemberAccessExpr
+    args: list
+
+@dataclass
+class StructArg(_Ast):
+    name: str 
+    value: str 
 
 
 @dataclass
@@ -384,6 +439,11 @@ class StructDefn(_Defn, _TypeExpr):
 @dataclass
 class StructCDefn(StructDefn):
     members: List[TypeAssign]
+
+@dataclass
+class Check(_Ast):
+    name: Ident
+    args: List[str]
 
 @dataclass
 class StructTupleDefn(StructDefn):
@@ -419,7 +479,20 @@ class StructValAssign(_Ast):
 class String(_Value):
     value: str
 
+@dataclass
+class AndExpr(_Expr):
+    a: _Expr
+    b: _Expr
 
+@dataclass
+class OrExpr(_Expr):
+    a: _Expr
+    b: _Expr
+
+@dataclass
+class IdentAssignExpr(_Expr):
+    ident: Ident
+    val: _Expr
 @dataclass
 class Integer(_Value):
     value: int
@@ -452,6 +525,8 @@ class CWScriptToAST(Transformer):
     decl_query = as_list
     decl_type = as_list
     
+    extends = as_list
+    implements = as_list
    
     annotations = as_list
     annotation_items = as_list
@@ -459,6 +534,7 @@ class CWScriptToAST(Transformer):
     errors_group = as_list
     events_group = as_list 
     exec_group = as_list 
+    query_group = as_list
     state_group = as_list
     fn_body = as_list
     fn_call_args = as_list
@@ -467,6 +543,9 @@ class CWScriptToAST(Transformer):
     map_keys = as_list
     struct_val_assigns = as_list
     enum_variant_defns = as_list
+    checks = as_list
+    contract_body = first
+    struct_call_args = as_list
    
     ## usually if the first elem is:
     ## RULE: "(" [plural] ")"
@@ -479,6 +558,7 @@ class CWScriptToAST(Transformer):
     integer = alias_to(Integer)
     string = alias_to(String)
     infix_op = first
+    prefix_op = first
     assign_op = first
     ident_pascal = alias_to(Ident)
     ident_snake = alias_to(Ident)

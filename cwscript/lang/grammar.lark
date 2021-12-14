@@ -5,12 +5,17 @@ file_code: root_lvl_stmt*
 ?root_lvl_stmt:
     | import_stmt
     | decl_contract
+    | decl_interface
 
 import_stmt: "import" import_list "from" string
 import_list: import_sym ("," import_sym)*
 import_sym: ident ["as" ident] // can be aliased
 
 ?decl_contract: contract_defn
+?decl_interface: interface_defn
+
+// INTERFACE BLOCK
+interface_defn: [annotations] "interface" ident_pascal contract_body
 
 // CONTRACT BLOCK
 contract_defn: [annotations] "contract" ident_pascal [extends] [implements] contract_body
@@ -78,10 +83,10 @@ exec_defn2: [annotations] ident fn_args [fn_body]
 
 ?decl_query: query_defn | query_group
 query_defn: [annotations] "query" ident fn_args "->" type_expr [fn_body] -> query_defn_fn
-    | [annotations] "query" ident fn_args "responds" struct_members_with_assign -> query_defn_responds
+    | [annotations] "query" ident fn_args "responds" (struct_members_with_assign | struct_members) -> query_defn_responds
 query_group: "query" "{" query_defn2+ "}"
 query_defn2: [annotations] ident fn_args "->" type_expr [fn_body] -> query_defn_fn2
-    | [annotations] ident fn_args "responds" struct_members_with_assign -> query_defn_responds2
+    | [annotations] ident fn_args "responds" (struct_members_with_assign | struct_members) -> query_defn_responds2
 
 ?decl_struct: struct_c_defn | struct_tuple_defn | struct_unit_defn
 struct_c_defn: [annotations] "struct" ident_pascal struct_members
@@ -98,7 +103,8 @@ annotation_items: annotation_item ("," annotation_item)*
 
 // BUILDING BLOCKS
 type_assign: [annotations] (ident | option_ident) ":" type_expr [checks]
-checks: ("#" ident [fn_call_args])+
+checks: check+
+check: ("#" ident [fn_call_args])
 option_ident: ident "?" 
 type_assign_and_set: type_assign "=" expr
 struct_members: "(" (type_assign ("," type_assign)*)? ")"
@@ -131,6 +137,7 @@ fn_body: "{" (stmt | expr)* "}"
 ?stmt: (member_access_expr | table_lookup_expr | ident) assign_op expr -> assign_stmt
     | control_flow_stmt
     | for_stmt
+    | "exec!" expr -> exec_stmt
     | "emit!" expr -> emit_stmt
     | "fail!" [expr] -> fail_stmt
     | "return" [expr] -> return_stmt
@@ -140,16 +147,18 @@ for_elem: ident
     | "{" ident ("," ident)* "}" -> for_destructure
 
 !assign_op: "=" | "+=" | "-=" | "*=" | "/=" | "%="
-if_expr: [if_clause | if_some] [else_if_clauses] ["else" fn_body]
+if_expr: (if_clause | if_some) [else_if_clauses] ["else" fn_body]
 if_clause: "if" expr fn_body
 if_some: "if?" expr fn_body
-else_if_clause: "else" if_expr
-?else_if_clauses: else_if_clauses+
+else_if_clause: "else" if_clause
+else_if_clauses: else_if_clause+
 ?control_flow_stmt: if_expr
 
 // EXPRESSIONS
 
-?expr: "(" expr ")"
+?expr: expr "and" expr -> and_expr
+    | expr "or" expr -> or_expr
+    | "query!" expr -> query_expr
     | ident_assign_expr
     | member_access_expr
     | table_lookup_expr
@@ -159,9 +168,7 @@ else_if_clause: "else" if_expr
     | struct_call_expr
     | value
     | ident
-    | expr "and" expr -> and_expr
-    | expr "or" expr -> or_expr
-    | expr "@" ident -> as_contract_expr
+    | "(" expr ")"
 
 ident_assign_expr: ident "=" expr
 
@@ -171,7 +178,7 @@ member_access_expr: expr "." ident
 table_lookup_expr: expr "[" expr "]"
 fn_call_expr: expr fn_call_args
 fn_call_args: "(" (expr ("," expr)*)? ")"
-struct_call_expr: expr struct_call_args
+struct_call_expr: member_access_expr struct_call_args
 struct_call_args: "(" (struct_arg ("," struct_arg)*)? ")"
 struct_arg: [ident ":"] expr
 
@@ -184,7 +191,7 @@ struct_arg: [ident ":"] expr
     | type_expr "?" -> option
     | "?" type_expr -> option
     | "(" type_expr ("," type_expr)* ")" -> tuple_type
-    | "[" type_expr "]" -> vector_type
+    | type_expr "[]"  -> vector_type
     | "&" type_expr -> ref_type
 
 typename: ident

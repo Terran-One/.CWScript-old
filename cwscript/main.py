@@ -3,8 +3,8 @@ from cwscript.codegen import ContractCodegen
 
 from cwscript.lang.ast import *
 from cwscript.lang.parser import parse_cwscript_src
+from cwscript.model import ContractModel
 
 ast = parse_cwscript_src(open("examples/cw20-base/cw20base.cws", "r").read())
-for cd in ast.collect_type(ContractDefn):
-    codegen = ContractCodegen(cd)
-    print(codegen.gen_contract())
+for contract in ast.collect_type(ContractDefn):
+    contract_model = ContractModel.from_ast(contract)

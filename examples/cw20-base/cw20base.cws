@@ -1,6 +1,58 @@
-import CW20 from "cw20.cws"
+interface CW20 {
+
+  exec {
+      transfer(recipient: Addr, amount: Uint128)
+      send(contract: Addr, amount: Addr, msg: Msg)
+      increase_allowance(spender: Addr, amount: Uint128, expires?: Expiration)
+      decrease_allowance(spender: Addr, amount: Uint128, expires?: Expiration)
+      transfer_from(owner: Addr, recipient: Addr, amount: Uint128)
+      send_from(owner: Addr, contract: Addr, amount: Uint128, msg: Binary)
+      burn_from(owner: Addr, amount: Uint128)
+      mint(recipient: String, amount: Uint128)
+  }
+
+  query {
+      balance(address: Addr) responds {
+          balance: Uint128
+      }
+      token_info() responds {
+          name: String,
+          symbol: String,
+          decimals: u8,
+          total_supply: Uint128
+      }
+      allowance(owner: String, spender: String) responds {
+          allowance: Uint128,
+          expires: Expiration
+      }
+      minter() responds (minter: Addr, cap?: Uint128)
+      marketing_info() responds {
+          project?: String,
+          description?: String,
+          logo?: LogoInfo,
+          marketing?: Addr
+      }
+      all_allowances(
+          owner: Addr,
+          start_after?: Addr,
+          limit?: u32
+      ) responds {
+          allowances: AllowanceInfo[]
+      }
+      all_accounts(owner: Addr, start_after?: Addr, limit?: u32) responds {
+          accounts: Addr[]
+      }
+  }
+}
 
 contract CW20Base implements CW20 {
+
+    error InvalidZeroAmount
+
+    event Transfer()
+    event Burn()
+    event Mint()
+    event Send()
 
     state token_info: @CW20::structs::TokenInfo
     state balances[user: Addr]: Uint128 
@@ -9,7 +61,7 @@ contract CW20Base implements CW20 {
         name: String,
         symbol: String,
         decimals: u8,
-        initial_balances: [struct Cw20Coin { address: Addr, amount: Uint128 }],
+        initial_balances: struct Cw20Coin { address: Addr, amount: Uint128 }[],
         mint?: @CW20::query::mint::response
     ) {
         total_supply = Uint128(0)
@@ -34,11 +86,6 @@ contract CW20Base implements CW20 {
         }
     }
 
-    // translates into:
-    // if ($arg == 0) {
-    //   fail! InvalidZeroAmount
-    // }
-
     check valid for Addr: $api.addr_validate($arg)
 
     exec transfer(recipient: Addr, amount: Uint128#not0) {
@@ -53,7 +100,7 @@ contract CW20Base implements CW20 {
         emit! Burn($info.sender, amount)
     }
 
-    exec mint(recipient: Addr#valid, amount: Uint128#not0) {
+    exec mint(recipient: Addr#valid, amount: Uint128#not0(0) #item0) {
         config = $state.token_info
         if (config.mint == None) or (config.mint.minter != $msg.sender) {
             fail! Unauthorized 
@@ -73,7 +120,7 @@ contract CW20Base implements CW20 {
         $state.balances[$msg.sender] -= amount
         $state.balances[contract] += amount
         emit! Send($msg.sender, contract, amount)
-        exec! (CW @ CW20Receiver).receive(sender: $msg.sender, amount, msg)
+        exec! CW20Receiver(contract).receive(sender: $msg.sender, amount, msg)
     }
 
     query balance(address: Addr#valid) responds {
@@ -95,6 +142,4 @@ contract CW20Base implements CW20 {
     
 }
 
-contract MyToken(CW20Base) implements CW20, CW721 {
-
-}
+contract MyToken(CW20Base) {}
