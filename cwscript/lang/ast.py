@@ -1,4 +1,4 @@
-from typing import Callable, Iterator, List, Optional, Union, Any
+from typing import Callable, Iterator, List, Optional, Type, Union, Any, TypeVar
 from itertools import *
 from dataclasses import dataclass
 
@@ -6,6 +6,10 @@ from lark import ast_utils, Transformer
 from lark.lexer import Token
 
 from cwscript.util.strings import pascal_to_snake, snake_to_pascal
+
+from cwscript.rust import *
+
+T = TypeVar("T")
 
 
 def iis(test, *types: list) -> bool:
@@ -49,11 +53,11 @@ class _Ast(ast_utils.Ast):
         """Gets children for which the provided predicate returns True."""
         return _collect(self, predicate)
 
-    def collect_type(self, *types, **kwargs):
-        return self.collect(lambda x: iis(x, *types), **kwargs)
+    def collect_type(self, _type: T, **kwargs) -> List[T]:
+        return self.collect(lambda x: iis(x, _type), **kwargs)
 
-    def contains_type(self, *types, **kwargs):
-        return len(self.collect_type(*types, **kwargs)) > 0
+    def contains_type(self, _type, **kwargs):
+        return len(self.collect_type(_type, **kwargs)) > 0
 
     def __contains__(self, _type) -> bool:
         """Alias for the 'in' operator."""
@@ -127,21 +131,23 @@ class EnumVariantDefn(_Defn):
 
 @dataclass
 class _EnumVariant(_Ast):
-    pass
-
+    name: "Ident"
 @dataclass
 class EnumVariantStruct(_EnumVariant):
-    name: "Ident"
-    members: list
+    members: List["TypeAssign"]
+    
+    def to_rust(self) -> VariantStruct:
+        return VariantStruct(str(self.name), [x.to_rust() for x in self.members])
 
 @dataclass
 class EnumVariantTuple(_EnumVariant):
-    name: "Ident"
     members: list
 
 @dataclass
 class EnumVariantUnit(_EnumVariant):
-    name: "Ident"
+
+    def to_rust(self) -> VariantUnit:
+        return VariantUnit(str(self.name))
 @dataclass
 class ErrorDefn(_Defn):
     defn: _EnumVariant
@@ -341,7 +347,6 @@ class TypeAssign(_Defn):
     name: Ident 
     type: _TypeExpr
     checks: list
-
 
 @dataclass
 class Typename(_TypeExpr):
