@@ -38,12 +38,8 @@ class ContractModel(_Model):
     converted into code."""
 
     def __init__(self, ast: ContractDefn, env=None):
-        if env is None:
-            env = ModelEnv()
-        self.env = env
-        self.ast = ast
-        self.errors = ContractErrors(ast.collect_type(ErrorDefn))
-        
+        exec_fn = ast.collect_type(ExecDefn)
+        pass
 
     def validate(self) -> List[Exception]:
         pass

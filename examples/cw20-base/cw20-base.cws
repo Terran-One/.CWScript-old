@@ -1,0 +1,10 @@
+contract CW20Base {
+    instantiate(
+        name: String,
+        symbol: String,
+        decimals: u8,
+        initial_balances: [Cw20Coin],
+        mint: MinterResponse,
+        marketing: self.query,
+    )
+}
