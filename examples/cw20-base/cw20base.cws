@@ -95,9 +95,9 @@ contract CW20Base implements CW20 {
     }
 
     exec burn(amount: Uint128#not0) {
-        $state.balances[$info.sender] -= amount
+        $state.balances[$msg.sender] -= amount
         $state.token_supply -= amount
-        emit! Burn($info.sender, amount)
+        emit! Burn($msg.sender, amount)
     }
 
     exec mint(recipient: Addr#valid, amount: Uint128#not0(0) #item0) {

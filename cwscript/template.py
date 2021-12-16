@@ -1,9 +1,8 @@
 import os
+from collections import defaultdict
 from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
-from collections import defaultdict
-
 
 this_dir = Path(os.path.dirname(__file__))
 parent_dir = this_dir.parent.absolute()

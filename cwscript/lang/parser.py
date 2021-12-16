@@ -1,12 +1,11 @@
 import os
 import sys
 
-from lark import Lark, ast_utils
 from black import FileMode, format_str
+from lark import Lark, ast_utils
 
 import cwscript.lang.ast
-from cwscript.lang.ast import _Ast, CWScriptToAST
-
+from cwscript.lang.ast import CWScriptToAST, _Ast
 
 this_module = sys.modules[__name__]
 grammar_path = os.path.join(os.path.dirname(__file__), "grammar.lark")

@@ -1,13 +1,14 @@
 import os
 from os import PathLike
-from typing import List
 from pathlib import Path
+from typing import List
 
-from cwscript.lang.parser import parse_cwscript_src
 from cwscript.lang.ast import ContractDefn
+from cwscript.lang.parser import parse_cwscript_src
 from cwscript.model import ContractModel
+from cwscript.template import contract_crate_templates as templates
+from cwscript.template import render_to_file
 from cwscript.util.strings import *
-from cwscript.template import contract_crate_templates as templates, render_to_file
 
 
 class CWScriptCompiler:
@@ -29,7 +30,6 @@ class CWScriptCompiler:
     def add_src_file(self, src_file_path: PathLike):
         with open(self._getpath(src_file_path), "r"):
             self.src_files.append(src_file_path)
-
 
     def generate_crate(
         self,

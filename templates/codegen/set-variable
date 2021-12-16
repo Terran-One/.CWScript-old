@@ -1,0 +1,11 @@
+{%- if rhs_is_item %}
+let __rhs = {{ rhs.key }}.may_load(&deps.storage)?;
+{% else %}
+let __rhs = {{ rhs }};
+{%- endif %}
+
+{%- if lhs_is_ident %}
+let mut {{ lhs }} = __rhs;
+{%- else %}
+{{ lhs }} = __rhs;
+{%- endif %}

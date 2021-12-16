@@ -1,0 +1,8 @@
+{
+    {%- if rhs_is_item %}
+    let rhs = {{ rhs.key }}.load(&deps.storage);
+    {%- else %}
+    let data = {{ rhs }};
+    {%- endif %}
+    {{ lhs.key }}.save(&mut deps.storage, &data);
+}

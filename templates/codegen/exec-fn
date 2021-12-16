@@ -1,0 +1,22 @@
+pub fn execute_{{ name }}(
+    __cw_deps: DepsMut,
+    __cw_env: Env,
+    __cw_info: MessageInfo,
+    {%- for arg in args %}
+    {{ arg[0] }}: {{ arg[1].typestr }},
+    {%- endfor %}
+) -> Result<Response, ContractError> {
+    let mut __logs = vec![];
+    let mut __msgs = vec![];
+    let mut __submsgs = vec![];
+    let mut __data = None;
+    {% for stmt in body %}
+    {{ stmt }}
+    {% endfor %}
+    Ok(Response {
+        logs: __logs,
+        msgs: __msgs,
+        submsgs: __submsgs,
+        data: __data
+    })
+}

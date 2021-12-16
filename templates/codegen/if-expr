@@ -1,0 +1,13 @@
+if {{ if_clause.predicate }} {
+{{ if_clause.body}}
+}
+{% for eic in else_if_clause %}
+else if {{ eic.predicate }} {
+{{ eic.body }}
+}
+{% endfor %}
+{% if else_body %}
+else {
+{{ else_body }}
+}
+{% endif %}

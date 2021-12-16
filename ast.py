@@ -904,7 +904,7 @@ FileCode(
                                     member=Ident(symbol=Token("__ANON_20", "balances")),
                                 ),
                                 key=MemberAccessExpr(
-                                    item=Ident(symbol=Token("__ANON_20", "$info")),
+                                    item=Ident(symbol=Token("__ANON_20", "$msg")),
                                     member=Ident(symbol=Token("__ANON_20", "sender")),
                                 ),
                             ),
@@ -924,7 +924,7 @@ FileCode(
                                 fn_name=Ident(symbol=Token("__ANON_20", "Burn")),
                                 args=[
                                     MemberAccessExpr(
-                                        item=Ident(symbol=Token("__ANON_20", "$info")),
+                                        item=Ident(symbol=Token("__ANON_20", "$msg")),
                                         member=Ident(
                                             symbol=Token("__ANON_20", "sender")
                                         ),

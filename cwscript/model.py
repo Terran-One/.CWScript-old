@@ -1,11 +1,13 @@
 from dataclasses import dataclass, field
 
+from rust import *
+
 from cwscript.lang.ast import *
 from cwscript.lang.ast import _Ast
-from cwscript.util.strings import *
+from cwscript.symbolic import SymExecVisitor
 from cwscript.util.context_env import *
+from cwscript.util.strings import *
 
-from rust import *
 
 class _Model:
     parent = None
@@ -17,7 +19,7 @@ class _Model:
     @classmethod
     def from_ast(cls, ast: _Ast):
         raise NotImplementedError(f"{cls.__name__}.from_ast() not implemented")
-    
+
     def validate(self) -> List[Exception]:
         raise NotImplementedError(f"{self.__class__.__name__} not implemented")
 
@@ -25,12 +27,13 @@ class _Model:
 class ModelEnv(Env):
     pass
 
-class ContractErrors(_Model):
 
+class ContractErrors(_Model):
     def __init__(self, ast: List[ErrorDefn], env=None):
         if env is None:
             env = ModelEnv()
         self.env = env
+
 
 class ContractModel(_Model):
 
@@ -38,14 +41,18 @@ class ContractModel(_Model):
     converted into code."""
 
     def __init__(self, ast: ContractDefn, env=None):
-        exec_fn = ast.collect_type(ExecDefn)
-        pass
+        exec = ast.collect_type(ExecDefn)
+        executor = SymExecVisitor()
+        for e in exec:
+            executor.visit(e)
 
     def validate(self) -> List[Exception]:
         pass
 
+
 class InterfaceModel(_Model):
     pass
+
 
 @dataclass
 class RustEnum:
@@ -53,14 +60,15 @@ class RustEnum:
     name: str
     variants: list = field(default_factory=list)
 
+
 @dataclass
 class RustStruct:
     name: str
-    
+
 
 @dataclass
 class ErrorModel(_Model):
-    
+
     name: str = None
     variant: str = None
     members: list = None
@@ -76,4 +84,3 @@ class ErrorModel(_Model):
         elif iis(cls, EnumVariantTuple):
             pass
         return cls(name, variant, members)
-

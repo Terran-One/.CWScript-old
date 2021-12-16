@@ -1,13 +1,12 @@
-from typing import Callable, Iterator, List, Optional, Type, Union, Any, TypeVar
-from itertools import *
 from dataclasses import dataclass
+from itertools import *
+from typing import Any, Callable, Iterator, List, Optional, Type, TypeVar, Union
 
-from lark import ast_utils, Transformer
+from lark import Transformer, ast_utils
 from lark.lexer import Token
 
-from cwscript.util.strings import pascal_to_snake, snake_to_pascal
-
 from cwscript.rust import *
+from cwscript.util.strings import pascal_to_snake, snake_to_pascal
 
 T = TypeVar("T")
 
@@ -15,6 +14,7 @@ T = TypeVar("T")
 def iis(test, *types: list) -> bool:
     """Returns `True` if `isinstance(test, t)` works for ANY `t` in `types`"""
     return any(isinstance(test, t) for t in types)
+
 
 def _collect(item, predicate: Callable[[Any], bool], *, dfs: bool = True):
     nodes = []
@@ -46,7 +46,8 @@ def _collect(item, predicate: Callable[[Any], bool], *, dfs: bool = True):
             return nodes
         nodes.extend(_collect(elem, predicate, dfs=False))
     return nodes
-    
+
+
 ## AST Nodes
 class _Ast(ast_utils.Ast):
     def collect(self, predicate: Callable[[Any], bool], *, dfs: bool = True) -> list:
@@ -62,19 +63,28 @@ class _Ast(ast_utils.Ast):
     def __contains__(self, _type) -> bool:
         """Alias for the 'in' operator."""
         if iis(_type, list, tuple):
-            return self.contains_type(*_type)
+            return self.contains_type(_type)
         return self.contains_type(_type)
 
     @property
     def children(self) -> dict:
         return self.__members__
-    
+
     @property
     def children_as_list(self) -> list:
         return list(self.__members__.values())
-    
+
     def is_ast(self) -> bool:
         return iis(self, _Ast)
+
+    def accept(self, visitor: "AstVisitor"):
+        return visitor.visit(self)
+
+
+class AstVisitor:
+    def visit(self, ast: _Ast):
+        raise NotImplementedError(f"{self.__name__}.visit() not implemented")
+
 
 @dataclass
 class Ident(_Ast):
@@ -93,16 +103,20 @@ class Ident(_Ast):
 class _Stmt(_Ast):
     pass
 
+
 class _Expr(_Ast):
     pass
+
 
 @dataclass
 class Annotation(_Ast):
     items: list
 
+
 @dataclass
 class _Defn(_Ast):
     annotations: Optional[List[Annotation]]
+
 
 @dataclass
 class FileCode(_Ast, ast_utils.AsList):
@@ -120,41 +134,47 @@ class ContractDefn(_Defn):
     interfaces: List[Ident]
     body: List[_ContractStmt]
 
+
 @dataclass
 class InterfaceDefn(_Defn):
     name: str
     body: List[_ContractStmt]
 
+
 @dataclass
 class EnumVariantDefn(_Defn):
     variant: "_EnumVariant"
 
+
 @dataclass
 class _EnumVariant(_Ast):
     name: "Ident"
+
+
 @dataclass
 class EnumVariantStruct(_EnumVariant):
     members: List["TypeAssign"]
-    
-    def to_rust(self) -> VariantStruct:
-        return VariantStruct(str(self.name), [x.to_rust() for x in self.members])
+
 
 @dataclass
 class EnumVariantTuple(_EnumVariant):
     members: list
 
+
 @dataclass
 class EnumVariantUnit(_EnumVariant):
+    pass
 
-    def to_rust(self) -> VariantUnit:
-        return VariantUnit(str(self.name))
+
 @dataclass
 class ErrorDefn(_Defn):
     defn: _EnumVariant
 
+
 @dataclass
 class EventDefn(_Defn):
     defn: _EnumVariant
+
 
 class _StateDefn(_Defn):
     pass
@@ -171,13 +191,16 @@ class ItemDefn(_StateDefn):
     key: Ident
     type: "_TypeExpr"
 
+
 @dataclass
 class MapDefn(_StateDefn):
     prefix: Ident
     keys: MapKey
     value: str
-    
+
+
 FnArgs = List["TypeAssign"]
+
 
 @dataclass
 class ExecDefn(_Defn):
@@ -185,27 +208,30 @@ class ExecDefn(_Defn):
     args: FnArgs
     body: str
 
+
 @dataclass
 class InfixOpExpr(_Ast):
     lhs: str
     op: str
     rhs: str
 
+
 @dataclass
 class PrefixOpExpr(_Ast):
     op: str
     arg: str
 
+
 @dataclass
-class MemberAccessExpr(_Ast):
-    item: str
-    member: str
+class MemberAccessExpr(_Expr):
+    item: _Expr
+    member: Ident
 
 
 @dataclass
-class TableLookupExpr(_Ast):
-    item: str
-    key: str
+class TableLookupExpr(_Expr):
+    item: _Expr
+    key: _Expr
 
 
 @dataclass
@@ -226,14 +252,17 @@ class IfClause(_Ast):
     predicate: str
     body: str
 
+
 @dataclass
 class IfSome(_Ast):
     predicate: str
     body: str
 
+
 @dataclass
 class OptionIdent(_Ast):
     ident: Ident
+
 
 @dataclass
 class ElseIfClause(_Ast):
@@ -248,7 +277,6 @@ class IfElseIfElseExpr(_Ast):
     else_clause: str
 
 
-
 @dataclass
 class _QueryDefn(_Defn):
     pass
@@ -260,6 +288,7 @@ class QueryDefnFn(_QueryDefn):
     args: FnArgs
     response_type: "_TypeExpr"
     body: Optional[List[Union[_Stmt, _Expr]]]
+
 
 @dataclass
 class QueryDefnResponds(_QueryDefn):
@@ -288,7 +317,8 @@ class _TypeExpr(_Ast):
     @property
     def typestr(self) -> str:
         raise NotImplementedError(f"property {self.__class__}.typestr not implemented")
-    
+
+
 @dataclass
 class TupleType(_TypeExpr, ast_utils.AsList):
     members: List[_TypeExpr]
@@ -297,60 +327,69 @@ class TupleType(_TypeExpr, ast_utils.AsList):
     def typestr(self) -> str:
         return f"({', '.join(m.typestr for m in self.members)})"
 
+
 @dataclass
 class VectorType(_TypeExpr):
     item: _TypeExpr
-    
+
     @property
     def typestr(self) -> str:
         return f"Vec<{self.item.typestr}>"
 
+
 @dataclass
 class RefType(_TypeExpr):
     wrapped: _TypeExpr
-    
+
     @property
     def typestr(self) -> str:
         return f"&{self.wrapped.typestr}"
 
+
 @dataclass
 class Option(_TypeExpr):
     wrapped: _TypeExpr
-   
-    @property 
+
+    @property
     def typestr(self) -> str:
         return f"Option<{self.wrapped.typestr}>"
+
 
 @dataclass
 class TypePath(_TypeExpr, ast_utils.AsList):
     parts: List[_TypeExpr]
-   
-    @property 
+
+    @property
     def typestr(self) -> str:
         return "::".join(x.typestr for x in self.parts)
+
 
 @dataclass
 class SimplePath(_Ast, ast_utils.AsList):
     parts: List[Ident]
-    
+
     def __str__(self) -> str:
         return "::".join(str(x) for x in self.parts)
+
 
 @dataclass
 class ReflectiveTypePath(_Ast):
     type_path: TypePath
-       
+
     def __str__(self) -> str:
         return "::".join(str(x) for x in self.parts)
+
+
 @dataclass
 class TypeAssign(_Defn):
-    name: Ident 
+    name: Ident
     type: _TypeExpr
     checks: list
 
+
 @dataclass
 class Typename(_TypeExpr):
-    name: Ident 
+    name: Ident
 
     @property
     def typestr(self) -> str:
@@ -386,15 +425,17 @@ class TypeAssignAndSet(_Ast):
 
 @dataclass
 class AssignStmt(_Stmt):
-    lhs: str
+    lhs: _Expr
     assign_op: str
-    rhs: str
+    rhs: _Expr
+
 
 @dataclass
 class ForStmt(_Stmt):
     for_elems: str
     iterable: str
     body: str
+
 
 @dataclass
 class CheckLambda(_Ast):
@@ -403,25 +444,29 @@ class CheckLambda(_Ast):
     predicate: _Expr
     error_type: _TypeExpr
 
+
 @dataclass
 class CheckFn(_Ast):
     name: Ident
     type_bound: _TypeExpr
     body: list
 
+
 @dataclass
 class ForDestructure(_Ast, ast_utils.AsList):
-    idents: Ident 
+    idents: Ident
+
 
 @dataclass
 class StructCallExpr(_Expr):
     fn: MemberAccessExpr
     args: list
 
+
 @dataclass
 class StructArg(_Ast):
-    name: str 
-    value: str 
+    name: str
+    value: str
 
 
 @dataclass
@@ -437,26 +482,33 @@ class EnumDefn(_Defn, _TypeExpr):
 @dataclass
 class StructDefn(_Defn, _TypeExpr):
     name: Ident
-    
+
     @property
     def typestr(self) -> str:
         return str(self.name)
+
+
 @dataclass
 class StructCDefn(StructDefn):
     members: List[TypeAssign]
+
 
 @dataclass
 class Check(_Ast):
     name: Ident
     args: List[str]
 
+
 @dataclass
 class StructTupleDefn(StructDefn):
     members: List[_TypeExpr]
 
+
 @dataclass
 class StructUnitDefn(StructDefn):
     pass
+
+
 @dataclass
 class EmitStmt(_Stmt):
     expr: _Expr
@@ -470,34 +522,42 @@ class FailStmt(_Stmt):
 class _Value(_Expr):
     pass
 
+
 @dataclass
 class StructVal(_Value):
     name: Ident
     members: list
+
 
 @dataclass
 class StructValAssign(_Ast):
     name: Ident
     value: _Expr
 
+
 @dataclass
 class String(_Value):
     value: str
+
 
 @dataclass
 class AndExpr(_Expr):
     a: _Expr
     b: _Expr
 
+
 @dataclass
 class OrExpr(_Expr):
     a: _Expr
     b: _Expr
 
+
 @dataclass
 class IdentAssignExpr(_Expr):
     ident: Ident
     val: _Expr
+
+
 @dataclass
 class Integer(_Value):
     value: int
@@ -512,16 +572,16 @@ class CWScriptToAST(Transformer):
 
     error_defn2 = alias_to(ErrorDefn)
     event_defn2 = alias_to(EventDefn)
-    
+
     ## state
-    item_defn2 = alias_to(ItemDefn) 
+    item_defn2 = alias_to(ItemDefn)
     map_defn2 = alias_to(MapDefn)
     exec_defn2 = alias_to(ExecDefn)
-    
+
     query_defn_fn2 = alias_to(QueryDefnFn)
     query_defn_responds2 = alias_to(QueryDefnResponds)
-    
-    decl_contract = as_list 
+
+    decl_contract = as_list
     decl_error = as_list
     decl_event = as_list
     decl_state = as_list
@@ -529,16 +589,16 @@ class CWScriptToAST(Transformer):
     decl_exec = as_list
     decl_query = as_list
     decl_type = as_list
-    
+
     extends = as_list
     implements = as_list
-   
+
     annotations = as_list
     annotation_items = as_list
     contract_stmts = as_list
     errors_group = as_list
-    events_group = as_list 
-    exec_group = as_list 
+    events_group = as_list
+    exec_group = as_list
     query_group = as_list
     state_group = as_list
     fn_body = as_list
@@ -551,14 +611,14 @@ class CWScriptToAST(Transformer):
     checks = as_list
     contract_body = first
     struct_call_args = as_list
-   
+
     ## usually if the first elem is:
     ## RULE: "(" [plural] ")"
     fn_args = as_list
     tuple_members = as_list
     struct_members = as_list
     struct_members_with_assign = as_list
-    
+
     ## values
     integer = alias_to(Integer)
     string = alias_to(String)

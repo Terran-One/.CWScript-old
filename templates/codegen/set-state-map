@@ -1,0 +1,8 @@
+{
+    let data = {{ rhs }};
+    {%- if lhs.keys | length == 1 %}
+    {{ lhs.base_key }}.save(&mut deps.storage, &{{ lhs.keys[0] }}, &data)?;
+    {%- else %}
+    {{ lhs.base_key }}.save(&mut deps.storage, &{{ lhs.keys }}, &data)?;
+    {%- endif %}
+}
