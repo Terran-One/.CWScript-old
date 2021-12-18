@@ -1,0 +1,15 @@
+contract william extends tiger implements william, chen {
+    error AParenStruct(abbot: power)
+    error ACurlyStruct {
+        abbot: power,
+        time: Pint,
+    }
+    error Item
+    errors {
+        AParenStruct(abbort: power)
+        ACurlyStruct {
+            abbotsdf: Abomination    
+        }
+        Item
+    }
+}

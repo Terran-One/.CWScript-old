@@ -9,11 +9,13 @@ packages = [{ include = "cwscript" }]
 python = "^3.8"
 lark = "^1.0.0"
 Jinja2 = "^3.0.3"
+antlr4-python3-runtime = "^4.9.3"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
 maturin = "^0.12.4"
 isort = "^5.10.1"
+black = "^21.12b0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
