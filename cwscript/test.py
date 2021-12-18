@@ -3,10 +3,12 @@ from cwscript.antlr.CWScriptLexer import CWScriptLexer
 from cwscript.antlr.CWScriptListener import CWScriptListener
 from cwscript.antlr.CWScriptParser import CWScriptParser
 
+
 class PrintContractListener(CWScriptListener):
     def enterContractDefn(self, ctx: CWScriptParser.ContractDefnContext):
         print(ctx.name, ctx.parent)
         return super().enterContractDefn(ctx)
+
 
 def main():
     lexer = CWScriptLexer(FileStream("examples/antlr.cws"))
@@ -17,5 +19,6 @@ def main():
     walker = ParseTreeWalker()
     walker.walk(printer, tree)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

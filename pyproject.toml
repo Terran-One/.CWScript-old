@@ -10,6 +10,7 @@ python = "^3.8"
 lark = "^1.0.0"
 Jinja2 = "^3.0.3"
 antlr4-python3-runtime = "^4.9.3"
+pygls = "^0.11.3"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
