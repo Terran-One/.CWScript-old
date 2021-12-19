@@ -64,6 +64,10 @@ $ cwsc init <PROJECT-NAME> [<PROJECT-DIR>]
 
 This command creates a new directory with the basic structure of a CWScript project. By default, the directory's name will be the provided `PROJECT-NAME` in lowercase kebab-case. If there is already a file or folder with that name, the compiler will complain and ask that you provide another location with `PROJECT-DIR`.
 
+### Bundled tooling
+
+CWScript ships with a set of standard tools to aid in the development of contracts. They are accessible through `cwsc tool <TOOL-NAME>`.
+
 ## Features
 
 - familiar syntax: can be learned and used easily without prior knowledge of Rust
