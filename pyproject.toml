@@ -3,7 +3,10 @@ name = "cwscript"
 version = "0.1.0"
 description = ""
 authors = ["William Chen <william@terran.one>"]
-packages = [{ include = "cwscript" }]
+packages = [{ include = "cwscript" }, { include = "cwsls" }]
+
+[tool.poetry.scripts]
+cwsls = "cwsls:start_server"
 
 [tool.poetry.dependencies]
 python = "^3.8"

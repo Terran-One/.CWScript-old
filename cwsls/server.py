@@ -93,7 +93,7 @@ def _validate_json(source):
                 end=Position(line=line - 1, character=col),
             ),
             message=msg,
-            source=type(json_server).__name__,
+            source=type(cws_server).__name__,
         )
 
         diagnostics.append(d)
@@ -116,7 +116,7 @@ def completions(params: Optional[CompletionParams] = None) -> CompletionList:
     )
 
 
-@json_server.command(JsonLanguageServer.CMD_COUNT_DOWN_BLOCKING)
+@cws_server.command(CWScriptLanguageServer.CMD_COUNT_DOWN_BLOCKING)
 def count_down_10_seconds_blocking(ls, *args):
     """Starts counting down and showing message synchronously.
     It will `block` the main thread, which can be tested by trying to show
@@ -127,7 +127,7 @@ def count_down_10_seconds_blocking(ls, *args):
         time.sleep(COUNT_DOWN_SLEEP_IN_SECONDS)
 
 
-@json_server.command(JsonLanguageServer.CMD_COUNT_DOWN_NON_BLOCKING)
+@cws_server.command(CWScriptLanguageServer.CMD_COUNT_DOWN_NON_BLOCKING)
 async def count_down_10_seconds_non_blocking(ls, *args):
     """Starts counting down and showing message asynchronously.
     It won't `block` the main thread, which can be tested by trying to show
@@ -138,30 +138,30 @@ async def count_down_10_seconds_non_blocking(ls, *args):
         await asyncio.sleep(COUNT_DOWN_SLEEP_IN_SECONDS)
 
 
-@json_server.feature(TEXT_DOCUMENT_DID_CHANGE)
+@cws_server.feature(TEXT_DOCUMENT_DID_CHANGE)
 def did_change(ls, params: DidChangeTextDocumentParams):
     """Text document did change notification."""
     _validate(ls, params)
 
 
-@json_server.feature(TEXT_DOCUMENT_DID_CLOSE)
-def did_close(server: JsonLanguageServer, params: DidCloseTextDocumentParams):
+@cws_server.feature(TEXT_DOCUMENT_DID_CLOSE)
+def did_close(server: CWScriptLanguageServer, params: DidCloseTextDocumentParams):
     """Text document did close notification."""
     server.show_message("Text Document Did Close")
 
 
-@json_server.feature(TEXT_DOCUMENT_DID_OPEN)
+@cws_server.feature(TEXT_DOCUMENT_DID_OPEN)
 async def did_open(ls, params: DidOpenTextDocumentParams):
     """Text document did open notification."""
     ls.show_message("Text Document Did Open")
     _validate(ls, params)
 
 
-@json_server.feature(
+@cws_server.feature(
     TEXT_DOCUMENT_SEMANTIC_TOKENS_FULL,
     SemanticTokensLegend(token_types=["operator"], token_modifiers=[]),
 )
-def semantic_tokens(ls: JsonLanguageServer, params: SemanticTokensParams):
+def semantic_tokens(ls: CWScriptLanguageServer, params: SemanticTokensParams):
     """See https://microsoft.github.io/language-server-protocol/specification#textDocument_semanticTokens
     for details on how semantic tokens are encoded."""
 
@@ -188,8 +188,8 @@ def semantic_tokens(ls: JsonLanguageServer, params: SemanticTokensParams):
     return SemanticTokens(data=data)
 
 
-@json_server.command(JsonLanguageServer.CMD_PROGRESS)
-async def progress(ls: JsonLanguageServer, *args):
+@cws_server.command(CWScriptLanguageServer.CMD_PROGRESS)
+async def progress(ls: CWScriptLanguageServer, *args):
     """Create and start the progress on the client."""
     token = "token"
     # Create
@@ -207,8 +207,8 @@ async def progress(ls: JsonLanguageServer, *args):
     ls.progress.end(token, WorkDoneProgressEnd(message="Finished"))
 
 
-@json_server.command(JsonLanguageServer.CMD_REGISTER_COMPLETIONS)
-async def register_completions(ls: JsonLanguageServer, *args):
+@cws_server.command(CWScriptLanguageServer.CMD_REGISTER_COMPLETIONS)
+async def register_completions(ls: CWScriptLanguageServer, *args):
     """Register completions method on the client."""
     params = RegistrationParams(
         registrations=[
@@ -228,15 +228,15 @@ async def register_completions(ls: JsonLanguageServer, *args):
         )
 
 
-@json_server.command(JsonLanguageServer.CMD_SHOW_CONFIGURATION_ASYNC)
-async def show_configuration_async(ls: JsonLanguageServer, *args):
+@cws_server.command(CWScriptLanguageServer.CMD_SHOW_CONFIGURATION_ASYNC)
+async def show_configuration_async(ls: CWScriptLanguageServer, *args):
     """Gets exampleConfiguration from the client settings using coroutines."""
     try:
         config = await ls.get_configuration_async(
             ConfigurationParams(
                 items=[
                     ConfigurationItem(
-                        scope_uri="", section=JsonLanguageServer.CONFIGURATION_SECTION
+                        scope_uri="", section=CWScriptLanguageServer.CONFIGURATION_SECTION
                     )
                 ]
             )
@@ -250,8 +250,8 @@ async def show_configuration_async(ls: JsonLanguageServer, *args):
         ls.show_message_log(f"Error ocurred: {e}")
 
 
-@json_server.command(JsonLanguageServer.CMD_SHOW_CONFIGURATION_CALLBACK)
-def show_configuration_callback(ls: JsonLanguageServer, *args):
+@cws_server.command(CWScriptLanguageServer.CMD_SHOW_CONFIGURATION_CALLBACK)
+def show_configuration_callback(ls: CWScriptLanguageServer, *args):
     """Gets exampleConfiguration from the client settings using callback."""
 
     def _config_callback(config):
@@ -267,7 +267,7 @@ def show_configuration_callback(ls: JsonLanguageServer, *args):
         ConfigurationParams(
             items=[
                 ConfigurationItem(
-                    scope_uri="", section=JsonLanguageServer.CONFIGURATION_SECTION
+                    scope_uri="", section=CWScriptLanguageServer.CONFIGURATION_SECTION
                 )
             ]
         ),
@@ -275,16 +275,16 @@ def show_configuration_callback(ls: JsonLanguageServer, *args):
     )
 
 
-@json_server.thread()
-@json_server.command(JsonLanguageServer.CMD_SHOW_CONFIGURATION_THREAD)
-def show_configuration_thread(ls: JsonLanguageServer, *args):
+@cws_server.thread()
+@cws_server.command(CWScriptLanguageServer.CMD_SHOW_CONFIGURATION_THREAD)
+def show_configuration_thread(ls: CWScriptLanguageServer, *args):
     """Gets exampleConfiguration from the client settings using thread pool."""
     try:
         config = ls.get_configuration(
             ConfigurationParams(
                 items=[
                     ConfigurationItem(
-                        scope_uri="", section=JsonLanguageServer.CONFIGURATION_SECTION
+                        scope_uri="", section=CWScriptLanguageServer.CONFIGURATION_SECTION
                     )
                 ]
             )
@@ -298,8 +298,8 @@ def show_configuration_thread(ls: JsonLanguageServer, *args):
         ls.show_message_log(f"Error ocurred: {e}")
 
 
-@json_server.command(JsonLanguageServer.CMD_UNREGISTER_COMPLETIONS)
-async def unregister_completions(ls: JsonLanguageServer, *args):
+@cws_server.command(CWScriptLanguageServer.CMD_UNREGISTER_COMPLETIONS)
+async def unregister_completions(ls: CWScriptLanguageServer, *args):
     """Unregister completions method on the client."""
     params = UnregistrationParams(
         unregisterations=[Unregistration(id=str(uuid.uuid4()), method=COMPLETION)]
@@ -311,3 +311,6 @@ async def unregister_completions(ls: JsonLanguageServer, *args):
         ls.show_message(
             "Error happened during completions unregistration.", MessageType.Error
         )
+
+def start_server():
+    cws_server.start_tcp("127.0.0.1", 14352)
