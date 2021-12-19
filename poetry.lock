@@ -102,6 +102,19 @@ MarkupSafe = ">=2.0"
 i18n = ["Babel (>=2.7)"]
 
 [[package]]
+name = "kanren"
+version = "0.2.3"
+description = "Logic Programming in python"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+multipledispatch = "*"
+toolz = "*"
+unification = "*"
+
+[[package]]
 name = "lark"
 version = "1.0.0"
 description = "a modern parsing library"
@@ -113,6 +126,18 @@ python-versions = "*"
 atomic_cache = ["atomicwrites"]
 nearley = ["js2py"]
 regex = ["regex"]
+
+[[package]]
+name = "logical-unification"
+version = "0.4.4"
+description = "Logical unification in Python"
+category = "main"
+optional = false
+python-versions = ">=3.6"
+
+[package.dependencies]
+multipledispatch = "*"
+toolz = "*"
 
 [[package]]
 name = "markupsafe"
@@ -140,6 +165,17 @@ description = "More routines for operating on iterables, beyond itertools"
 category = "dev"
 optional = false
 python-versions = ">=3.5"
+
+[[package]]
+name = "multipledispatch"
+version = "0.6.0"
+description = "Multiple dispatch"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+six = "*"
 
 [[package]]
 name = "mypy-extensions"
@@ -266,6 +302,14 @@ checkqa-mypy = ["mypy (==v0.761)"]
 testing = ["argcomplete", "hypothesis (>=3.56)", "mock", "nose", "requests", "xmlschema"]
 
 [[package]]
+name = "six"
+version = "1.16.0"
+description = "Python 2 and 3 compatibility utilities"
+category = "main"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*"
+
+[[package]]
 name = "toml"
 version = "0.10.2"
 description = "Python Library for Tom's Obvious, Minimal Language"
@@ -280,6 +324,14 @@ description = "A lil' TOML parser"
 category = "dev"
 optional = false
 python-versions = ">=3.6"
+
+[[package]]
+name = "toolz"
+version = "0.11.2"
+description = "List processing tools and functional utilities"
+category = "main"
+optional = false
+python-versions = ">=3.5"
 
 [[package]]
 name = "typeguard"
@@ -302,6 +354,18 @@ optional = false
 python-versions = ">=3.6"
 
 [[package]]
+name = "unification"
+version = "0.2.2"
+description = "Unification"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+multipledispatch = "*"
+toolz = "*"
+
+[[package]]
 name = "wcwidth"
 version = "0.2.5"
 description = "Measures the displayed width of unicode strings in a terminal"
@@ -309,10 +373,18 @@ category = "dev"
 optional = false
 python-versions = "*"
 
+[[package]]
+name = "z3-solver"
+version = "4.8.13.0"
+description = "an efficient SMT solver library"
+category = "main"
+optional = false
+python-versions = "*"
+
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "f1c783b0084c8a3d345b5d557d95c93008d575e6a89e58043e80c21634b1ff33"
+content-hash = "584d86669318fa391af775ee39c422e8c5f745631fc5dd22a0bf47a644c9daa8"
 
 [metadata.files]
 antlr4-python3-runtime = [
@@ -346,9 +418,15 @@ jinja2 = [
     {file = "Jinja2-3.0.3-py3-none-any.whl", hash = "sha256:077ce6014f7b40d03b47d1f1ca4b0fc8328a692bd284016f806ed0eaca390ad8"},
     {file = "Jinja2-3.0.3.tar.gz", hash = "sha256:611bb273cd68f3b993fabdc4064fc858c5b47a973cb5aa7999ec1ba405c87cd7"},
 ]
+kanren = [
+    {file = "kanren-0.2.3.tar.gz", hash = "sha256:e11403a4f02fbbcb790ad7e1e01a22a9caa89fd5c79e38c0da6447a2de0084c4"},
+]
 lark = [
     {file = "lark-1.0.0-py2.py3-none-any.whl", hash = "sha256:10818563b44e18ea264b5013a80fe04406999ad51bacc74214f69f13d95af6e1"},
     {file = "lark-1.0.0.tar.gz", hash = "sha256:2269dee215e6c689d5ce9d34fdc6e749d0c1c763add3fc7935938ebd7da159cb"},
+]
+logical-unification = [
+    {file = "logical-unification-0.4.4.tar.gz", hash = "sha256:b351b8665e1c03b048bba42d993afe94f8e17c8d76bfdee2cdc3b95461e64114"},
 ]
 markupsafe = [
     {file = "MarkupSafe-2.0.1-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:d8446c54dc28c01e5a2dbac5a25f071f6653e6e40f3a8818e8b45d790fe6ef53"},
@@ -444,6 +522,11 @@ more-itertools = [
     {file = "more-itertools-8.12.0.tar.gz", hash = "sha256:7dc6ad46f05f545f900dd59e8dfb4e84a4827b97b3cfecb175ea0c7d247f6064"},
     {file = "more_itertools-8.12.0-py3-none-any.whl", hash = "sha256:43e6dd9942dffd72661a2c4ef383ad7da1e6a3e968a927ad7a6083ab410a688b"},
 ]
+multipledispatch = [
+    {file = "multipledispatch-0.6.0-py2-none-any.whl", hash = "sha256:407e6d8c5fa27075968ba07c4db3ef5f02bea4e871e959570eeb69ee39a6565b"},
+    {file = "multipledispatch-0.6.0-py3-none-any.whl", hash = "sha256:a55c512128fb3f7c2efd2533f2550accb93c35f1045242ef74645fc92a2c3cba"},
+    {file = "multipledispatch-0.6.0.tar.gz", hash = "sha256:a7ab1451fd0bf9b92cab3edbd7b205622fb767aeefb4fb536c2e3de9e0a38bea"},
+]
 mypy-extensions = [
     {file = "mypy_extensions-0.4.3-py2.py3-none-any.whl", hash = "sha256:090fedd75945a69ae91ce1303b5824f428daf5a028d2f6ab8a299250a846f15d"},
     {file = "mypy_extensions-0.4.3.tar.gz", hash = "sha256:2d82818f5bb3e369420cb3c4060a7970edba416647068eb4c5343488a6c604a8"},
@@ -504,6 +587,10 @@ pytest = [
     {file = "pytest-5.4.3-py3-none-any.whl", hash = "sha256:5c0db86b698e8f170ba4582a492248919255fcd4c79b1ee64ace34301fb589a1"},
     {file = "pytest-5.4.3.tar.gz", hash = "sha256:7979331bfcba207414f5e1263b5a0f8f521d0f457318836a7355531ed1a4c7d8"},
 ]
+six = [
+    {file = "six-1.16.0-py2.py3-none-any.whl", hash = "sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254"},
+    {file = "six-1.16.0.tar.gz", hash = "sha256:1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926"},
+]
 toml = [
     {file = "toml-0.10.2-py2.py3-none-any.whl", hash = "sha256:806143ae5bfb6a3c6e736a764057db0e6a0e05e338b5630894a5f779cabb4f9b"},
     {file = "toml-0.10.2.tar.gz", hash = "sha256:b3bda1d108d5dd99f4a20d24d9c348e91c4db7ab1b749200bded2f839ccbe68f"},
@@ -511,6 +598,10 @@ toml = [
 tomli = [
     {file = "tomli-1.2.3-py3-none-any.whl", hash = "sha256:e3069e4be3ead9668e21cb9b074cd948f7b3113fd9c8bba083f48247aab8b11c"},
     {file = "tomli-1.2.3.tar.gz", hash = "sha256:05b6166bff487dc068d322585c7ea4ef78deed501cc124060e0f238e89a9231f"},
+]
+toolz = [
+    {file = "toolz-0.11.2-py3-none-any.whl", hash = "sha256:a5700ce83414c64514d82d60bcda8aabfde092d1c1a8663f9200c07fdcc6da8f"},
+    {file = "toolz-0.11.2.tar.gz", hash = "sha256:6b312d5e15138552f1bda8a4e66c30e236c831b612b2bf0005f8a1df10a4bc33"},
 ]
 typeguard = [
     {file = "typeguard-2.13.3-py3-none-any.whl", hash = "sha256:5e3e3be01e887e7eafae5af63d1f36c849aaa94e3a0112097312aabfa16284f1"},
@@ -520,7 +611,18 @@ typing-extensions = [
     {file = "typing_extensions-4.0.1-py3-none-any.whl", hash = "sha256:7f001e5ac290a0c0401508864c7ec868be4e701886d5b573a9528ed3973d9d3b"},
     {file = "typing_extensions-4.0.1.tar.gz", hash = "sha256:4ca091dea149f945ec56afb48dae714f21e8692ef22a395223bcd328961b6a0e"},
 ]
+unification = [
+    {file = "unification-0.2.2-py2.py3-none-any.whl", hash = "sha256:fbf883f0ec618a34b806a830afae2f51833d9db013b520519707b34d7f20c282"},
+    {file = "unification-0.2.2.tar.gz", hash = "sha256:e83972eda9a365b51eee97d72436136bfd44b0146f06bb7e8a28cca3eafc79b3"},
+]
 wcwidth = [
     {file = "wcwidth-0.2.5-py2.py3-none-any.whl", hash = "sha256:beb4802a9cebb9144e99086eff703a642a13d6a0052920003a230f3294bbe784"},
     {file = "wcwidth-0.2.5.tar.gz", hash = "sha256:c4d647b99872929fdb7bdcaa4fbe7f01413ed3d98077df798530e5b04f116c83"},
+]
+z3-solver = [
+    {file = "z3-solver-4.8.13.0.tar.gz", hash = "sha256:eff1087d82132593c8851c89486e2512810d801d594d70526e2878b574bef797"},
+    {file = "z3_solver-4.8.13.0-py2.py3-none-macosx_10_16_x86_64.whl", hash = "sha256:058d9fac03aa4f6cd2be7c5fd578ea8ed7d49adb3ed844acba845e9623525881"},
+    {file = "z3_solver-4.8.13.0-py2.py3-none-manylinux1_x86_64.whl", hash = "sha256:65c7004f3642da288f15fbba8397f763c6f56746e320a5636cb1f2308027f50c"},
+    {file = "z3_solver-4.8.13.0-py2.py3-none-win32.whl", hash = "sha256:52a84e8368cbcd92ced06bbbf350db1d280573923c69025f519b6cc26ab74bb7"},
+    {file = "z3_solver-4.8.13.0-py2.py3-none-win_amd64.whl", hash = "sha256:d0a07e5fbe2a9d4ef4cfab5ffd2d770f3f138a47a2942dceb9aa5438d53e4dd7"},
 ]

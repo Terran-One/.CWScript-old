@@ -101,10 +101,6 @@ B(arg3)
 C(arg4)
 ```
 
-with will be called
-function for each check will be run against the argument it
-which
-
 ```cws
 contract ... {
     exec try_something(balance: Uint128 #notzero)

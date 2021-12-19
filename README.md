@@ -2,6 +2,15 @@
 
 CWScript is a scripting language for writing smart contracts that run on blockchains such as Terra that use the CosmWasm as an execution layer.
 
+## Features
+
+- familiar syntax: can be learned and used easily without prior knowledge of Rust
+- built-in language constructs for contract semantics
+- compiles to functioning CosmWasm Rust code that comply with Standard Model's guidelines
+- provides a common framework for communicating contracts with non-developers
+- bundled with helpful tooling & generators, and easily extensible
+- provides a better framework for composability and code-reusability
+
 ## Installation
 
 CWScript requires a environment with a installation of Python v3.7+.
@@ -67,15 +76,6 @@ This command creates a new directory with the basic structure of a CWScript proj
 ### Bundled tooling
 
 CWScript ships with a set of standard tools to aid in the development of contracts. They are accessible through `cwsc tool <TOOL-NAME>`.
-
-## Features
-
-- familiar syntax: can be learned and used easily without prior knowledge of Rust
-- built-in language constructs for contract semantics
-- compiles into conventional CosmWasm Rust following best practices
-- provides a common framework for communicating contracts with non-developers
-- bundled with helpful tooling & generators, and easily extensible
-- provides a better framework for composability and code-reusability
 
 ## Contents
 
